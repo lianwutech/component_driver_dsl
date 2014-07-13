@@ -1,3 +1,5 @@
+var _ = require('lodash');
+
 var customMatchers = {
   toHaveField: function() {
     return {
@@ -27,15 +29,21 @@ var customMatchers = {
       }
     };
   },
-  toHaveErrorOn: function() {
+  toHaveError: function() {
     return {
       compare: function(actual, expected) {
         var result = {};
-        result.pass = (actual.errors && actual.errors[expected]);
+        function checkErrors() {
+          if (!actual.errors) return false;
+          return _.some(actual.errors, function(msg) {
+            return _.contains(msg, expected);
+          });
+        }
+        result.pass = checkErrors();
         if (!result.pass) {
-          result.message =  "Expected " + JSON.stringify(actual) + " to have error on " + expected;
+          result.message =  "Expected " + JSON.stringify(actual) + " to have error message '" + expected + "'";
         } else {
-          result.message =  "Expected " + JSON.stringify(actual) + " to not have error on " + expected;
+          result.message =  "Expected " + JSON.stringify(actual) + " to not have error message '" + expected + "'";
         }
         return result;
       }

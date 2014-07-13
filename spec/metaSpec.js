@@ -1,14 +1,52 @@
 describe("Driver meta data", function() {
   beforeEach(function() {
     jasmine.addMatchers(require('./matchers'));
-    delete require.cache['../lib/dsl.js']
     DSL = require('../lib/dsl.js');
     driver = new DSL();
   });
-  it("set name field", function() {
-    expect(driver).toHaveErrorOn('name');
+  it("should check if driver name supplied", function() {
+    var errMsg ='Driver name() is required';
+    expect(driver).toHaveError(errMsg);
     driver.name("驱动名称");
     expect(driver).toHaveField('name');
-    expect(driver).not.toHaveErrorOn('name');
+    expect(driver).not.toHaveError(errMsg);
+  });
+  it("should check if driver desc supplied", function() {
+    var errMsg ='Driver desc() is required';
+    expect(driver).toHaveError(errMsg);
+    driver.desc("驱动描述");
+    expect(driver).toHaveField('desc');
+    expect(driver).not.toHaveError(errMsg);
+  });
+  it("should check if driver version supplied", function() {
+    var errMsg ='Driver version() is required';
+    expect(driver).toHaveError(errMsg);
+    driver.version("v0.1");
+    expect(driver).toHaveField('version');
+    expect(driver).not.toHaveError(errMsg);
+  });
+  it("should check driver version format", function() {
+    driver.version("这不是一个合法的版本号");
+    expect(driver).not.toHaveField('version');
+    expect(driver).toHaveError('Driver version is malformed');
+  });
+  it("should check if driver author supplied", function() {
+    var errMsg ='Driver author() is required';
+    expect(driver).toHaveError(errMsg);
+    driver.author("邓大卫");
+    expect(driver).toHaveField('author');
+    expect(driver).not.toHaveError(errMsg);
+  });
+  it("should check if author\'s email supplied", function() {
+    var errMsg ='Driver email() is required';
+    expect(driver).toHaveError(errMsg);
+    driver.email("david@lianwutech.com");
+    expect(driver).toHaveField('email');
+    expect(driver).not.toHaveError(errMsg);
+  });
+  it("should check email address format", function() {
+    driver.email("这不是一个Email地址");
+    expect(driver).not.toHaveField('email');
+    expect(driver).toHaveError('Driver email is malformed');
   });
 });

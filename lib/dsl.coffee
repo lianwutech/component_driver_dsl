@@ -13,16 +13,46 @@ class ComponentDriverDSL
     'email'
   ]
   constructor: ->
-    @errors = {}
+    @field_given = {}
     required_fields.forEach (field) =>
-      @errors[field] = true
+      @field_given[field] = false
     @fields = {}
     @actions = []
     @states = {}
+
   name: (str) ->
     @fields.name = str
-    @errors.name = false
-    this
+    @field_given.name = true
+
+  desc: (str) ->
+    @fields.desc = str
+    @field_given.desc = true
+
+  version: (str) ->
+    FORMAT = /v\d\.\d/
+    if str.match(FORMAT)
+      @fields.version = str
+      @field_given.version = true
+    else
+      addError 'Driver version is malformed'
+
+  author: (str) ->
+    @fields.author = str
+    @field_given.author = true
+
+  email: (str) ->
+    FORMAT = ///
+    [\w\.]+
+    @
+    [\w]+
+    \.
+    [a-zA-Z]+
+    ///
+    if str.match(FORMAT)
+      @fields.email = str
+      @field_given.email = true
+    else
+      addError 'Driver author\'s email is malformed'
 
   action: (name, desc, fn) ->
     @actions.push(arguments);

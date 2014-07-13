@@ -15,5 +15,8 @@
     "gulp-util": "~2.2.20",
     "gulp-shell": "~0.2.8",
     "jasmine-node": "~1.14.3"
+  },
+  "dependencies": {
+    "lodash": "~2.4.1"
   }
 }
