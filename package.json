@@ -1,0 +1,19 @@
+{
+  "name": "driver",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "BSD-2-Clause",
+  "devDependencies": {
+    "gulp": "~3.8.6",
+    "gulp-jasmine": "git://github.com/merlinran/gulp-jasmine.git#master",
+    "gulp-coffee": "~2.1.0",
+    "gulp-util": "~2.2.20",
+    "gulp-shell": "~0.2.8",
+    "jasmine-node": "~1.14.3"
+  }
+}
