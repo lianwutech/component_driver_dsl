@@ -15,10 +15,12 @@ gulp.task('coffee', function() {
     .pipe(gulp.dest('./lib/'));
 });
 
-gulp.task('test', function() {
+gulp.task('jasmine', function() {
   return gulp.src(paths.specs)
   .pipe(jasmine({verbose: false, includeStackTrace: true}));
 });
+
+gulp.task('test', ['coffee', 'jasmine']);
 
 gulp.task('watch', function() {
   gulp.watch(paths.coffee, ['coffee']);

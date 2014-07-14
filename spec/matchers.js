@@ -4,6 +4,7 @@ var customMatchers = {
   toHaveField: function() {
     return {
       compare: function(actual, expected) {
+        actual = actual.getResult();
         var result = {};
         result.pass = (actual.fields && actual.fields[expected]);
         if (!result.pass) {
@@ -18,6 +19,7 @@ var customMatchers = {
   toHaveAction: function() {
     return {
       compare: function(actual, expected) {
+        actual = actual.getResult();
         var result = {};
         result.pass = (actual.actions && actual.actions[expected]);
         if (!result.pass) {
@@ -33,6 +35,7 @@ var customMatchers = {
     return {
       compare: function(actual, expected) {
         var result = {};
+        actual = actual.getResult();
         function checkErrors() {
           if (!actual.errors) return false;
           return _.some(actual.errors, function(msg) {

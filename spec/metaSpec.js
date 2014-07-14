@@ -21,7 +21,7 @@ describe("Driver meta data", function() {
   it("should check if driver version supplied", function() {
     var errMsg ='Driver version() is required';
     expect(driver).toHaveError(errMsg);
-    driver.version("v0.1");
+    driver.version("0.1");
     expect(driver).toHaveField('version');
     expect(driver).not.toHaveError(errMsg);
   });
@@ -48,5 +48,17 @@ describe("Driver meta data", function() {
     driver.email("这不是一个Email地址");
     expect(driver).not.toHaveField('email');
     expect(driver).toHaveError('Driver email is malformed');
+  });
+  it("meta data setter can be chained", function() {
+    driver.name('DJ390型电磁阀')
+    .version('0.1')
+    .desc('宇宙第一好的驱动，但是有8个BUG')
+    .author("邓大卫")
+    .email("david@lianwutech.com");
+    expect(driver).toHaveField('name');
+    expect(driver).toHaveField('version');
+    expect(driver).toHaveField('desc');
+    expect(driver).toHaveField('author');
+    expect(driver).toHaveField('email');
   });
 });
