@@ -51,6 +51,22 @@ var customMatchers = {
         return result;
       }
     };
+  },
+
+
+  toHaveParameter: function() {
+    return {
+      compare: function(actual, expected) {
+        var result = {};
+        result.pass = (actual.parameters && actual.parameters[expected]);
+        if (!result.pass) {
+          result.message =  "Expected " + JSON.stringify(actual) + " to have parameter " + expected;
+        } else {
+          result.message =  "Expected " + JSON.stringify(actual) + " to not have parameter " + expected;
+        }
+        return result;
+      }
+    };
   }
 };
 

@@ -1,5 +1,63 @@
+STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+ARGUMENT_NAMES = /([^\s,]+)/g;
+getParamNames = (func) ->
+  fnStr = func.toString().replace(STRIP_COMMENTS, '')
+  result = fnStr.slice(fnStr.indexOf('(')+1, fnStr.indexOf(')')).match(ARGUMENT_NAMES)
+  result = [] if !result?
+  return result
+
 class Action
-  constructor: ->
+ constructor: (@name, @desc, @fn)->
+    @errors = []
+    @parameters = {}
+    @parameter_names = getParamNames(@fn)
+
+  parameter: (name, desc, type, options)->
+    checkType = =>
+      switch type
+        when 'string' then return true
+        when 'integer'
+          return true if options? and 
+                         typeof(options['min']) == 'integer' and
+                         typeof(options['max']) == 'integer' and
+                         typeof(options['step']) == 'integer'
+          @errors.push "Options 'min', 'max' and 'step' required for integer parameter"
+          return false
+        when 'enum'
+          return true if options? and options['enum']? and
+                         options['enum'].isArray() and
+                         options['enum'].length > 0
+          @errors.push "Option 'enum' required for enum parameter"
+          return false
+        else 
+          @errors.push "Valid parameter type: 'string', 'integer', 'enum'"
+          return false
+
+    if name not in @parameter_names
+      @errors.push "Action '#{@name}' has no parameter '#{name}'"
+    else if !desc? || desc.trim() == ''
+      @errors.push "Please call parameter(name, desc, type, options)"
+    else if !type?
+      @errors.push "Please call parameter(name, desc, type, options)"
+    else if checkType()
+      @parameters[name] = {
+        desc: desc
+        type: type
+        options: options
+      }
+
+    return this
+
+  getResult: ->
+    all_errors = [].concat @errors
+    for name in @parameter_names
+      if name not in @parameters
+        all_errors.push "Parameter '#{name}' not defined"
+
+    return {
+      parameters: @parameters
+      errors: all_errors
+    }
 
 class State
   constructor: ->
@@ -15,8 +73,7 @@ class ComponentDriverDSL
 
   constructor: ->
     @field_given = {}
-    required_fields.forEach (field) =>
-      @field_given[field] = false
+    @field_given[field] = false for field in required_fields
     @fields = {}
     @actions = {}
     @states = {}
@@ -65,25 +122,33 @@ class ComponentDriverDSL
     this
 
   action: (name, desc, fn) ->
-    if typeof(desc) != 'string' || desc.length == 0
-      this.addError "Please provide description for action #{name}"
-    else if  typeof(fn) != 'function'
-      this.addError "Please provide function body for action #{name}"
+    if typeof(name) != 'string' || name.length == 0 ||
+       typeof(desc) != 'string' || desc.length == 0 ||
+       typeof(fn) != 'function'
+      this.addError "Please call action(name, desc, fn)"
     else
-      @actions[name] = {
-        desc: desc
-        func: fn
-      }
-    this
+      @actions[name] = new Action(name, desc, fn)
 
   getResult: ->
-    field_errors = []
+    all_errors = [].concat @errors
+    valid_actions = {}
+
     for own field, given of @field_given
       if !given
-        field_errors .push "Driver #{field}() is required"
+        all_errors.push "Driver #{field}() is required"
+
+    for own name, action of @actions
+      action = action.getResult()
+      if action.errors.length > 0
+        all_errors = all_errors.concat(action.errors)
+      else
+        valid_actions[name]= @actions[name]
+
     return {
       fields: @fields
-      errors: field_errors.concat(@errors)
-      actions: @actions
+      errors: all_errors.concat(@errors)
+      actions: valid_actions
     }
-module.exports = ComponentDriverDSL;
+
+if module?
+  module.exports = ComponentDriverDSL;
