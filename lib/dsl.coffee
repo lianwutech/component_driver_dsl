@@ -1,3 +1,4 @@
+# ref http://stackoverflow.com/questions/1007981/how-to-get-function-parameter-names-values-dynamically-from-javascript
 STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
 ARGUMENT_NAMES = /([^\s,]+)/g;
 getParamNames = (func) ->
@@ -6,8 +7,11 @@ getParamNames = (func) ->
   result = [] if !result?
   return result
 
+typeIsArray = Array.isArray ||
+(value) -> return {}.toString.call( value ) is '[object Array]'
+
 class Action
- constructor: (@name, @desc, @fn)->
+  constructor: (@name, @desc, @fn)->
     @errors = []
     @parameters = {}
     @parameter_names = getParamNames(@fn)
@@ -16,21 +20,19 @@ class Action
     checkType = =>
       switch type
         when 'string' then return true
-        when 'integer'
+        when 'number'
           return true if options? and
-                         typeof(options['min']) == 'integer' and
-                         typeof(options['max']) == 'integer' and
-                         typeof(options['step']) == 'integer'
-          @errors.push "Options 'min', 'max' and 'step' required for integer parameter"
+                         typeof(options['min']) == 'number' and
+                         typeof(options['max']) == 'number' and
+                         typeof(options['step']) == 'number'
+          @errors.push "Options 'min', 'max' and 'step' required for number parameter"
           return false
         when 'enum'
-          return true if options? and options['enum']? and
-                         options['enum'].isArray() and
-                         options['enum'].length > 0
+          return true if options? and typeIsArray(options) and options.length > 0
           @errors.push "Option 'enum' required for enum parameter"
           return false
         else 
-          @errors.push "Valid parameter type: 'string', 'integer', 'enum'"
+          @errors.push "Valid parameter type: 'string', 'number', 'enum'"
           return false
 
     if name not in @parameter_names
@@ -51,8 +53,8 @@ class Action
   getResult: ->
     all_errors = [].concat @errors
     for name in @parameter_names
-      if name not in @parameters
-        all_errors.push "Parameter '#{name}' not defined"
+      if !@parameters[name]?
+        all_errors.push "Parameter '#{name}' not defined for action '#{@name}'"
 
     return {
       parameters: @parameters
@@ -141,6 +143,11 @@ class ComponentDriverDSL
       this.addError "Please call state(name, desc)"
     else
       @states[name] = new State(name, desc)
+
+  data_handler: (@data_handler) ->
+    this
+  get_state: (@get_state) ->
+    this
 
   getResult: ->
     all_errors = [].concat @errors

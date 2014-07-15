@@ -1,9 +1,9 @@
 driver.name('DJ390型电磁阀')
 .version('0.1')
 .desc('宇宙第一好的驱动，但是有8个BUG')
-.author('')
-.email('')
-.process_data(function(raw_data) {
+.author('david')
+.email('david@lianwutech.com')
+.data_handler(function(raw_data) {
   return decoded_data;
 })
 .get_state(function() {
@@ -19,12 +19,12 @@ driver.action('close', '关闭水阀', function() {
 
 driver.action('set_threshold', '设置上下限', function(min, max) {
 })
-.parameter('min', 'XX下限', 'integer', {
+.parameter('min', 'XX下限', 'number', {
     min: 0,
     max: 95,
     step: 5
   })
-.parameter('max', 'XX上限', 'integer', {
+.parameter('max', 'XX上限', 'number', {
   min: 5,
   max: 100,
   step: 5
@@ -40,3 +40,5 @@ driver.state('open', '已打开')
 
 driver.state('closed', '已关闭')
 .permit('open', 'set_threshold', 'set_emotion');
+
+if (module) { module.exports = driver; }

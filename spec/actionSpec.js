@@ -32,6 +32,7 @@ describe("Driver actions", function() {
     it("should add valid parameter", function() {
       expect(action).not.toHaveParameter('param');
       action.parameter('param', 'param description', 'string');
+      expect(action).not.toHaveError();
       expect(action).toHaveParameter('param');
     });
     it("should not add parameter if lack of description", function() {
@@ -47,7 +48,7 @@ describe("Driver actions", function() {
     it("should not add parameter if type is unknown", function() {
       action.parameter('param', 'param description', 'unknown');
       expect(action).not.toHaveParameter('param');
-      expect(action).toHaveError("Valid parameter type: 'string', 'integer', 'enum'");
+      expect(action).toHaveError("Valid parameter type: 'string', 'number', 'enum'");
     });
     it("should match real function parameters", function() {
       action.parameter('fakeparam', 'param description', 'string');
@@ -55,7 +56,7 @@ describe("Driver actions", function() {
       expect(action).toHaveError("Action 'open' has no parameter 'fakeparam'");
     });
     it("should include all parameters", function() {
-      expect(action).toHaveError("Parameter 'param' not defined");
+      expect(action).toHaveError("Parameter 'param' not defined for action 'open'");
     });
     it("can be chained", function() {
       action = driver.action('open', 'action description', function(param1, param2) { });
@@ -63,6 +64,7 @@ describe("Driver actions", function() {
       action.parameter('param2', 'param description', 'string');
       expect(action).toHaveParameter('param1');
       expect(action).toHaveParameter('param2');
+      expect(action).not.toHaveError();
     });
   });
 
@@ -72,15 +74,28 @@ describe("Driver actions", function() {
     });
     describe("string", function() {
     });
-    describe("integer", function() {
-      it("should have min and max", function() {
-        action.parameter('param', 'param description', 'integer');
+    describe("number", function() {
+      it("should pass if min, max and step is number", function() {
+        action.parameter('param', 'param description', 'number', {min: 1, max: 100, step: 1});
+        expect(action).toHaveParameter('param');
+      });
+      it("should fail if options not provided", function() {
+        action.parameter('param', 'param description', 'number');
         expect(action).not.toHaveParameter('param');
-        expect(action).toHaveError("Options 'min', 'max' and 'step' required for integer parameter");
+        expect(action).toHaveError("Options 'min', 'max' and 'step' required for number parameter");
+      });
+      it("should fail if step is not number", function() {
+        action.parameter('param', 'param description', 'number', {min: 1, max: 100, step: 'x'});
+        expect(action).not.toHaveParameter('param');
+        expect(action).toHaveError("Options 'min', 'max' and 'step' required for number parameter");
       });
     });
     describe("enum", function() {
-      it("should have valid items", function() {
+      it("should pass if have valid items", function() {
+        action.parameter('param', 'param description', 'enum', ['item1', 'item2']);
+        expect(action).toHaveParameter('param');
+      });
+      it("should fail if no valid items provided", function() {
         action.parameter('param', 'param description', 'enum');
         expect(action).not.toHaveParameter('param');
         expect(action).toHaveError("Option 'enum' required for enum parameter");
@@ -97,6 +112,13 @@ describe("Driver actions", function() {
       expect(zero).not.toHaveParameter('param');
       expect(driver).toHaveError("Action 'zero' has no parameter 'param'");
     });
+  });
+
+  it("should add valid action with all parameter definitions", function() {
+    driver.action('set_threshold', '设置上下限', function(min, max) { })
+    .parameter('min', 'param description', 'number', {min: 1, max: 100, step: 1})
+    .parameter('max', 'param description', 'number', {min: 1, max: 100, step: 1});
+    expect(driver).toHaveAction('set_threshold');
   });
 
   it("should not add action if lack of parameter list", function() {

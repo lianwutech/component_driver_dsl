@@ -52,7 +52,8 @@ var customMatchers = {
         var result = {};
         actual = actual.getResult();
         function checkErrors() {
-          if (!actual.errors) return false;
+          if (actual.errors.length === 0) return false;
+          if (typeof expected === "undefined" || expected === null) return true;
           return _.some(actual.errors, function(msg) {
             return _.contains(msg, expected);
           });
