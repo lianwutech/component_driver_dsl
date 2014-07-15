@@ -15,12 +15,10 @@ gulp.task('coffee', function() {
     .pipe(gulp.dest('./lib/'));
 });
 
-gulp.task('jasmine', function() {
+gulp.task('test', ['coffee'], function() {
   return gulp.src(paths.specs)
   .pipe(jasmine({verbose: false, includeStackTrace: true}));
 });
-
-gulp.task('test', ['coffee', 'jasmine']);
 
 gulp.task('watch', function() {
   gulp.watch(paths.coffee, ['coffee']);
@@ -28,4 +26,4 @@ gulp.task('watch', function() {
   gulp.watch(paths.js, ['test']);
 });
 
-gulp.task('default', ['coffee', 'test', 'watch']);
+gulp.task('default', ['test', 'watch']);

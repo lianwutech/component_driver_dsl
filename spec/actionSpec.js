@@ -10,17 +10,17 @@ describe("Driver actions", function() {
     expect(driver).toHaveAction('open');
   });
   it("should not add action if lack of name", function() {
-    driver.action('', 'desc', function() { });
-    expect(driver).not.toHaveAction('open');
+    driver.action(' ', 'desc', function() { });
+    expect(driver).not.toHaveAction(' ');
     expect(driver).toHaveError("Please call action(name, desc, fn)");
   });
   it("should not add action if lack of description", function() {
-    driver.action('open', '', function() { });
+    driver.action('open', ' ', function() { });
     expect(driver).not.toHaveAction('open');
     expect(driver).toHaveError("Please call action(name, desc, fn)");
   });
   it("should not add action if lack of function", function() {
-    driver.action('open', 'desc', '');
+    driver.action('open', 'desc', ' ');
     expect(driver).not.toHaveAction('open');
     expect(driver).toHaveError("Please call action(name, desc, fn)");
   });
@@ -35,12 +35,12 @@ describe("Driver actions", function() {
       expect(action).toHaveParameter('param');
     });
     it("should not add parameter if lack of description", function() {
-      action.parameter('param', '', 'string');
+      action.parameter('param', ' ', 'string');
       expect(action).not.toHaveParameter('param');
       expect(action).toHaveError("Please call parameter(name, desc, type, options)");
     });
     it("should not add parameter if lack of type", function() {
-      action.parameter('param', 'param description');
+      action.parameter('param', 'param description', ' ');
       expect(action).not.toHaveParameter('param');
       expect(action).toHaveError("Please call parameter(name, desc, type, options)");
     });
@@ -56,6 +56,13 @@ describe("Driver actions", function() {
     });
     it("should include all parameters", function() {
       expect(action).toHaveError("Parameter 'param' not defined");
+    });
+    it("can be chained", function() {
+      action = driver.action('open', 'action description', function(param1, param2) { });
+      action.parameter('param1', 'param description', 'string');
+      action.parameter('param2', 'param description', 'string');
+      expect(action).toHaveParameter('param1');
+      expect(action).toHaveParameter('param2');
     });
   });
 

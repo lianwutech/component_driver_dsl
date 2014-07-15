@@ -31,6 +31,21 @@ var customMatchers = {
       }
     };
   },
+  toHaveState: function() {
+    return {
+      compare: function(actual, expected) {
+        actual = actual.getResult();
+        var result = {};
+        result.pass = (actual.states && actual.states[expected]);
+        if (!result.pass) {
+          result.message =  "Expected " + JSON.stringify(actual) + " to have state " + expected;
+        } else {
+          result.message =  "Expected " + JSON.stringify(actual) + " to not have state " + expected;
+        }
+        return result;
+      }
+    };
+  },
   toHaveError: function() {
     return {
       compare: function(actual, expected) {
@@ -57,6 +72,7 @@ var customMatchers = {
   toHaveParameter: function() {
     return {
       compare: function(actual, expected) {
+        actual = actual.getResult();
         var result = {};
         result.pass = (actual.parameters && actual.parameters[expected]);
         if (!result.pass) {

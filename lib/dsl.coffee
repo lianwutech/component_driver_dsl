@@ -17,7 +17,7 @@ class Action
       switch type
         when 'string' then return true
         when 'integer'
-          return true if options? and 
+          return true if options? and
                          typeof(options['min']) == 'integer' and
                          typeof(options['max']) == 'integer' and
                          typeof(options['step']) == 'integer'
@@ -37,7 +37,7 @@ class Action
       @errors.push "Action '#{@name}' has no parameter '#{name}'"
     else if !desc? || desc.trim() == ''
       @errors.push "Please call parameter(name, desc, type, options)"
-    else if !type?
+    else if !type? || type.trim() == ''
       @errors.push "Please call parameter(name, desc, type, options)"
     else if checkType()
       @parameters[name] = {
@@ -61,6 +61,12 @@ class Action
 
 class State
   constructor: ->
+    @permitted_actions = []
+
+  permit: ->
+    for action in arguments
+      @permitted_actions.push(action)
+    return this
 
 class ComponentDriverDSL
   required_fields = [
@@ -122,16 +128,24 @@ class ComponentDriverDSL
     this
 
   action: (name, desc, fn) ->
-    if typeof(name) != 'string' || name.length == 0 ||
-       typeof(desc) != 'string' || desc.length == 0 ||
+    if typeof(name) != 'string' || name.trim().length == 0 ||
+       typeof(desc) != 'string' || desc.trim().length == 0 ||
        typeof(fn) != 'function'
       this.addError "Please call action(name, desc, fn)"
     else
       @actions[name] = new Action(name, desc, fn)
 
+  state: (name, desc) ->
+    if typeof(name) != 'string' || name.trim().length == 0 ||
+       typeof(desc) != 'string' || desc.trim().length == 0
+      this.addError "Please call state(name, desc)"
+    else
+      @states[name] = new State(name, desc)
+
   getResult: ->
     all_errors = [].concat @errors
     valid_actions = {}
+    valid_states = {}
 
     for own field, given of @field_given
       if !given
@@ -144,10 +158,25 @@ class ComponentDriverDSL
       else
         valid_actions[name]= @actions[name]
 
+    isValidState = (name, state)=>
+      if state.permitted_actions.length == 0
+        all_errors.push "State '#{name}' has no permitted action"
+        return false
+      else
+        for action in state.permitted_actions
+          if  !valid_actions[action]?
+            all_errors.push "State '#{name}': can\'t permit nonexist action '#{action}'"
+            return false
+      return true
+
+    for own name, state of @states
+      valid_states[name] = state if isValidState(name, state)
+
     return {
       fields: @fields
-      errors: all_errors.concat(@errors)
+      errors: all_errors
       actions: valid_actions
+      states: valid_states
     }
 
 if module?
