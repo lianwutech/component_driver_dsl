@@ -146,7 +146,8 @@ class ComponentDriverDSL
 
   data_handler: (@data_handler) ->
     this
-  get_state: (@get_state) ->
+
+  data_format: (@format) ->
     this
 
   getResult: ->

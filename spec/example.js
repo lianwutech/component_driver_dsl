@@ -1,44 +1,46 @@
-driver.name('DJ390型电磁阀')
+driver.name('iRobot型人形机器人')
 .version('0.1')
-.desc('宇宙第一好的驱动，但是有8个BUG')
+.desc('初代版本')
 .author('david')
-.email('david@lianwutech.com')
-.data_handler(function(raw_data) {
-  return decoded_data;
+.email('david@lianwutech.com');
+
+driver.action('move', '移动', function(direction) {
 })
-.get_state(function() {
-  // ...
-  return computed_state;
+.parameter('direction', '移动方向', 'enum', ['东', '南', '西', '北']);
+
+driver.action('stop', '停下', function() {
 });
 
-driver.action('open', '打开水阀', function() {
-});
-
-driver.action('close', '关闭水阀', function() {
-});
-
-driver.action('set_threshold', '设置上下限', function(min, max) {
+driver.action('set_speed_range', '设置移动速度的范围', function(min, max) {
 })
-.parameter('min', 'XX下限', 'number', {
-    min: 0,
-    max: 95,
-    step: 5
-  })
-.parameter('max', 'XX上限', 'number', {
+.parameter('min', '最低速度', 'number', {
+  unit: 'km',
+  min: 0,
+  max: 95,
+  step: 5
+})
+.parameter('max', '最高速度', 'number', {
+  unit: 'km',
   min: 5,
   max: 100,
   step: 5
 });
 
-driver.action('set_emotion', '设置表情', function(emotion) {
+driver.state('moving', '移动中')
+.permit('stop', 'set_speed_range');
+
+driver.state('stopped', '已停止')
+.permit('move', 'set_speed_range');
+
+driver.data_handler(function(raw_data) {
+  return {
+    data: { direction: '东', speed: 12.5 },
+    state: 'moving'
+  };
 })
-.parameter('emotion', '表情', 'enum', ['笑', '哭']
-);
-
-driver.state('open', '已打开')
-.permit('close', 'set_threshold', 'set_emotion');
-
-driver.state('closed', '已关闭')
-.permit('open', 'set_threshold', 'set_emotion');
+.data_format({
+  "direction": { "type": "enum", "items": ['东', '南', '西', '北']},
+  "speed": { "type": "number", "decimals": 2, "unit": "km" },
+});
 
 if (module) { module.exports = driver; }

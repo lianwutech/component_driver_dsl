@@ -2,6 +2,7 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var jasmine = require('gulp-jasmine');
 var coffee = require('gulp-coffee');
+var watch = require('gulp-watch');
 
 var paths = {
   coffee: ['lib/*.coffee'],
@@ -20,10 +21,9 @@ gulp.task('test', ['coffee'], function() {
   .pipe(jasmine({verbose: false, includeStackTrace: true}));
 });
 
-gulp.task('watch', function() {
-  gulp.watch(paths.coffee, ['coffee']);
-  gulp.watch(paths.specs, ['test']);
-  gulp.watch(paths.js, ['test']);
-});
+/*gulp.task('watch', function() {
+  watch(paths.coffee, ['test']);
+  watch(paths.specs, ['test']);
+});*/
 
 gulp.task('default', ['test', 'watch']);
