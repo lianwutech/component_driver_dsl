@@ -4,11 +4,11 @@ driver.name('TS35型温度传感器')
 .author('david')
 .email('david@lianwutech.com');
 
-driver.data_handler(function(raw_data) {
+driver.data_processor(function(raw_data) {
   return {
     data: { 'temp': 39.5 }
   };
-}).data_format({
+}).return_data({
   "temp": { "type": "number", "decimals": 2, "unit": "°C" }
 });
 

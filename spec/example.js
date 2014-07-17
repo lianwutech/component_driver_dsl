@@ -32,14 +32,14 @@ driver.state('moving', '移动中')
 driver.state('stopped', '已停止')
 .permit('move', 'set_speed_range');
 
-driver.data_handler(function(raw_data) {
+driver.data_processor(function(raw_data) {
   return {
     data: { direction: '东', speed: 12.5 },
     state: 'moving'
   };
 })
-.data_format({
-  "direction": { "type": "enum", "items": ['东', '南', '西', '北']},
+.return_data({
+  "direction": { "type": "string" },
   "speed": { "type": "number", "decimals": 2, "unit": "km" },
 });
 

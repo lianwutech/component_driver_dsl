@@ -4,11 +4,11 @@ driver.name('MS35型湿度传感器')
 .author('david')
 .email('david@lianwutech.com');
 
-driver.data_handler(function(raw_data) {
+driver.data_processor(function(raw_data) {
   return {
     data: { 'mois': 65 }
   };
-}).data_format({
+}).return_data({
   "mois": { "type": "integer", "unit": "％" }
 });
 

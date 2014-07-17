@@ -70,6 +70,54 @@ class State
       @permitted_actions.push(action)
     return this
 
+class RawDataProcessor
+  constructor: ->
+    @permitted_actions = []
+
+  return_data: (@data_format) ->
+    @will_return_data = true
+    this
+
+  return_state: ->
+    @will_return_state = true
+    this
+
+  getResult: ->
+    errors = []
+    retval = {}
+    checkType = (item)=>
+        switch item.type
+          when "number"
+            if typeof(item.unit) != 'string' || item.unit.trim().length == 0
+              errors.push "data type 'number' should have unit"
+            else if typeof(item.decimals) != 'number' ||
+                    item.decimals % 1 != 0 ||
+                    !(0 <= item.decimals <= 9)
+              errors.push "decimals of data type 'number' should within range [0..9]"
+          when "boolean"
+            if typeof(item["true"]) != 'string' || item["true"].trim().length == 0 ||
+               typeof(item["false"]) != 'string' || item["false"].trim().length == 0
+              errors.push "should specify meaning for 'true' and 'false' of boolean type"
+          when "string"
+            null
+          else
+            errors.push "allowed return data types are 'number', 'string' and 'boolean'"
+
+    if !@will_return_data && !@will_return_state
+      errors.push "data_processor should return_data() or return_state(), or both"
+    else
+      retval.data_format = @date_format
+      retval.will_return_data = !!@will_return_data
+      retval.will_return_state = !!@will_return_state
+      for own key, item of @data_format
+        if typeof(item.name) != 'string' || item.name.trim().length == 0
+          errors.push "returned data '#{key}' should have name"
+        else if typeof(item.type) != 'string' || item.type.trim().length == 0
+          errors.push "returned data '#{key}' should have type"
+        else checkType(item)
+    retval.errors = errors
+    return retval;
+
 class ComponentDriverDSL
   required_fields = [
     'name'
@@ -144,11 +192,8 @@ class ComponentDriverDSL
     else
       @states[name] = new State(name, desc)
 
-  data_handler: (@data_handler) ->
-    this
-
-  data_format: (@format) ->
-    this
+  data_processor: () ->
+    @raw_data_processor = new RawDataProcessor(arguments)
 
   getResult: ->
     all_errors = [].concat @errors
@@ -180,12 +225,23 @@ class ComponentDriverDSL
     for own name, state of @states
       valid_states[name] = state if isValidState(name, state)
 
-    return {
+    retval = {
       fields: @fields
       errors: all_errors
       actions: valid_actions
       states: valid_states
     }
+
+    if !@raw_data_processor?
+      all_errors.push "data_processor() not provided"
+    else
+      processor = @raw_data_processor.getResult()
+      if  processor.errors.length > 0
+        all_errors = all_errors.concat(processor.errors)
+      else
+        retval.data_processor = processor
+
+    return retval
 
 if module?
   module.exports = ComponentDriverDSL;
