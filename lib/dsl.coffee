@@ -106,15 +106,16 @@ class RawDataProcessor
     if !@will_return_data && !@will_return_state
       errors.push "data_processor should return_data() or return_state(), or both"
     else
-      retval.data_format = @date_format
-      retval.will_return_data = !!@will_return_data
-      retval.will_return_state = !!@will_return_state
+      if @will_return_data
+        retval.will_return_data = true
+        retval.data_format = @data_format
       for own key, item of @data_format
         if typeof(item.name) != 'string' || item.name.trim().length == 0
           errors.push "returned data '#{key}' should have name"
         else if typeof(item.type) != 'string' || item.type.trim().length == 0
           errors.push "returned data '#{key}' should have type"
         else checkType(item)
+      retval.will_return_state = !!@will_return_state
     retval.errors = errors
     return retval;
 

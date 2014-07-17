@@ -19,11 +19,14 @@ describe("Driver data processor", function() {
       "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" },
     });
     expect(processor).not.toHaveError();
+    expect(processor.getResult().data_format).toBeTruthy();
+    expect(processor.getResult().will_return_data).toBe(true);
   });
   it("can also return state", function() {
     var processor = driver.data_processor(function(raw) {});
     processor.return_state();
     expect(processor).not.toHaveError();
+    expect(processor.getResult().will_return_state).toBe(true);
   });
   it("or both", function() {
     var processor = driver.data_processor(function(raw) {});
@@ -31,6 +34,9 @@ describe("Driver data processor", function() {
       "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" },
     }).return_state();
     expect(processor).not.toHaveError();
+    expect(processor.getResult().data_format).toBeTruthy();
+    expect(processor.getResult().will_return_data).toBe(true);
+    expect(processor.getResult().will_return_state).toBe(true);
   });
   describe("data format", function() {
     beforeEach(function() {
