@@ -1,4 +1,4 @@
-describe("Driver meta data", function() {
+describe("meta data", function() {
   beforeEach(function() {
     jasmine.addMatchers(require('./matchers'));
     DSL = require('../lib/dsl.js');

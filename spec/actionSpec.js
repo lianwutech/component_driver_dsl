@@ -1,4 +1,4 @@
-describe("Driver actions", function() {
+describe("actions", function() {
   beforeEach(function() {
     jasmine.addMatchers(require('./matchers'));
     DSL = require('../lib/dsl.js');
