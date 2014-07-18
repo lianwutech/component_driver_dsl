@@ -99,6 +99,7 @@ describe("Driver data processor", function() {
   });
   describe("runtime behaviour", function() {
     beforeEach(function() {
+      driver.state('none', '没有状态', []);
       driver.data_processor(function(raw) {
         return {
           data: { x: parseInt(raw.substring(0,2), 16), y: parseInt(raw.substring(2,4), 16) },
@@ -109,7 +110,7 @@ describe("Driver data processor", function() {
         "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" }
       });
     });
-    it("should allow number, string and boolean type", function() {
+    it("should return valid data and state", function() {
       var result = driver.process_data("CCFF");
       expect(result.data).toEqual({x: 204, y: 255});
       expect(result.state).toEqual("none");

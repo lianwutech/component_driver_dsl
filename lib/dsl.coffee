@@ -246,13 +246,6 @@ class ComponentDriverDSL
 
     return retval
   process_data: (hex_raw_data) ->
-    str2ab = (str) ->
-      buf = new ArrayBuffer(str.length*2);
-      bufView = new Uint16Array(buf);
-      `for (var i=0, strLen=str.length; i<strLen; i++) {
-        bufView[i] = str.charCodeAt(i);
-      }`
-      return new DataView(buf)
     @raw_data_processor.process(hex_raw_data)
 if module?
   module.exports = ComponentDriverDSL;
