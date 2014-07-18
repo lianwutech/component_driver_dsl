@@ -34,11 +34,12 @@ driver.state('stopped', '已停止')
 
 driver.data_processor(function(raw_data) {
   return {
-    data: { direction: '东', speed: 12.5 },
+    data: { direction: '东', speed: 12.5, raw: raw_data },
     state: 'moving'
   };
 })
 .return_data({
+  "raw": { "type": "string" },
   "direction": { "type": "string" },
   "speed": { "type": "number", "decimals": 2, "unit": "km" },
 });

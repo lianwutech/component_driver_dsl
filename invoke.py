@@ -7,6 +7,7 @@ ctxt.enter()
 ctxt.eval(driver)
 ctxt.eval(example)
 result = ctxt.eval("var result = driver.process_data(\"A4B83290DE\");");
-print ctxt.locals.result.data.direction
-print ctxt.locals.result.data.speed
-print ctxt.locals.result.state
+print "raw = " + ctxt.locals.result.data.raw
+print "direction = " + ctxt.locals.result.data.direction
+print "speed = %f" % ctxt.locals.result.data.speed
+print "state = " + ctxt.locals.result.state
