@@ -9,7 +9,7 @@ driver.data_processor(function(raw_data) {
     data: { 'temp': 39.5 }
   };
 }).return_data({
-  "temp": { "type": "number", "decimals": 2, "unit": "°C" }
+  "temp": { "name": "温度", "type": "number", "decimals": 2, "unit": "°C" }
 });
 
 if (module) { module.exports = driver; }

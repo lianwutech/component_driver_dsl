@@ -9,7 +9,7 @@ driver.data_processor(function(raw_data) {
     data: { 'mois': 65 }
   };
 }).return_data({
-  "mois": { "type": "integer", "unit": "％" }
+  "mois": { "name": "湿度", "type": "number", "unit": "％" }
 });
 
 if (module) { module.exports = driver; }

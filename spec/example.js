@@ -39,9 +39,9 @@ driver.data_processor(function(raw_data) {
   };
 })
 .return_data({
-  "raw": { "type": "string" },
-  "direction": { "type": "string" },
-  "speed": { "type": "number", "decimals": 2, "unit": "km" },
+  "raw": { "name": "原始数据", "type": "string" },
+  "direction": { "name": "方向", "type": "string" },
+  "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" },
 });
 
 if (typeof module !== 'undefined') { module.exports = driver; }

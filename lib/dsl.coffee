@@ -92,10 +92,12 @@ class RawDataProcessor
           when "number"
             if typeof(item.unit) != 'string' || item.unit.trim().length == 0
               errors.push "data type 'number' should have unit"
-            else if typeof(item.decimals) != 'number' ||
+            else
+              if !item.decimals? then item.decimals = 0
+              if typeof(item.decimals) != 'number' ||
                     item.decimals % 1 != 0 ||
                     !(0 <= item.decimals <= 9)
-              errors.push "decimals of data type 'number' should within range [0..9]"
+                errors.push "decimals of data type 'number' should within range [0..9]"
           when "boolean"
             if typeof(item["true"]) != 'string' || item["true"].trim().length == 0 ||
                typeof(item["false"]) != 'string' || item["false"].trim().length == 0
@@ -230,7 +232,6 @@ class ComponentDriverDSL
 
     retval = {
       fields: @fields
-      errors: all_errors
       actions: valid_actions
       states: valid_states
     }
@@ -244,9 +245,12 @@ class ComponentDriverDSL
       else
         retval.data_processor = processor
 
+    retval.errors = all_errors
     return retval
+
   process_data: (hex_raw_data) ->
     @raw_data_processor.process(hex_raw_data)
+
 if module?
   module.exports = ComponentDriverDSL;
 else
