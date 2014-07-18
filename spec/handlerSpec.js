@@ -48,7 +48,7 @@ describe("Driver data processor", function() {
         "direction": { "name": "方向", "type": "string" },
         "has_obstacle": { "name": "障碍物", "type": "boolean", "true": "有", "false": "没有"}
       });
-      expect(processor).not.toHaveError("return_data() not defined");
+      expect(processor).not.toHaveError();
     });
     it("should have name supplied", function() {
       processor.return_data({
@@ -95,6 +95,25 @@ describe("Driver data processor", function() {
         });
         expect(processor).toHaveError("should specify meaning for 'true' and 'false' of boolean type");
       });
+    });
+  });
+  describe("runtime behaviour", function() {
+    beforeEach(function() {
+      driver.data_processor(function(raw) {
+        return {
+          data: { x: parseInt(raw.substring(0,2), 16), y: parseInt(raw.substring(2,4), 16) },
+          state: 'none'
+        };
+      })
+      .return_data({
+        "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" }
+      });
+    });
+    it("should allow number, string and boolean type", function() {
+      var result = driver.process_data("CCFF");
+      expect(result.data).toEqual({x: 204, y: 255});
+      expect(result.state).toEqual("none");
+      expect(result.error).toBeUndefined();
     });
   });
 });

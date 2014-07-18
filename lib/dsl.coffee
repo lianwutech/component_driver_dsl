@@ -71,8 +71,10 @@ class State
     return this
 
 class RawDataProcessor
-  constructor: ->
-    @permitted_actions = []
+  constructor: (@fn)->
+
+  process: (raw_data) ->
+    @fn(raw_data)
 
   return_data: (@data_format) ->
     @will_return_data = true
@@ -193,8 +195,8 @@ class ComponentDriverDSL
     else
       @states[name] = new State(name, desc)
 
-  data_processor: () ->
-    @raw_data_processor = new RawDataProcessor(arguments)
+  data_processor: (fn) ->
+    @raw_data_processor = new RawDataProcessor(fn)
 
   getResult: ->
     all_errors = [].concat @errors
@@ -243,6 +245,16 @@ class ComponentDriverDSL
         retval.data_processor = processor
 
     return retval
-
+  process_data: (hex_raw_data) ->
+    str2ab = (str) ->
+      buf = new ArrayBuffer(str.length*2);
+      bufView = new Uint16Array(buf);
+      `for (var i=0, strLen=str.length; i<strLen; i++) {
+        bufView[i] = str.charCodeAt(i);
+      }`
+      return new DataView(buf)
+    @raw_data_processor.process(hex_raw_data)
 if module?
   module.exports = ComponentDriverDSL;
+else
+  driver = new ComponentDriverDSL();

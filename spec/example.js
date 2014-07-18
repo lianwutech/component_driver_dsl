@@ -43,4 +43,4 @@ driver.data_processor(function(raw_data) {
   "speed": { "type": "number", "decimals": 2, "unit": "km" },
 });
 
-if (module) { module.exports = driver; }
+if (typeof module !== 'undefined') { module.exports = driver; }
