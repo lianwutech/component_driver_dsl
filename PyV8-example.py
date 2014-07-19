@@ -1,13 +1,13 @@
 from pyv8 import PyV8
 import json
 
-driver = open('lib/dsl.js', 'r').read()
-example = open('spec/example.js', 'r').read()
 ctxt = PyV8.JSContext()
 ctxt.enter()
+driver = open('lib/dsl.js', 'r').read()
 ctxt.eval(driver)
+example = open('spec/example.js', 'r').read()
 ctxt.eval(example)
-ctxt.eval("var meta_data = JSON.stringify(driver.getResult())")
+ctxt.eval("var meta_data = JSON.stringify(driver.validate())")
 
 meta_data = json.loads(ctxt.locals.meta_data)
 print "meta data:"
@@ -19,8 +19,10 @@ print meta_data["actions"]
 print "states:"
 print meta_data["states"]
 
+print "process_data:"
 result = ctxt.eval("JSON.stringify(driver.process_data(\"A4B83290DE\"));")
 print json.loads(result)
 
-result = ctxt.action("driver.execute('move')")
+print "execute:"
+result = ctxt.eval("driver.execute('move')")
 print result

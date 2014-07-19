@@ -50,7 +50,7 @@ class Action
 
     return this
 
-  getResult: ->
+  validate: ->
     all_errors = [].concat @errors
     for name in @parameter_names
       if !@parameters[name]?
@@ -84,7 +84,7 @@ class RawDataProcessor
     @will_return_state = true
     this
 
-  getResult: ->
+  validate: ->
     errors = []
     retval = {}
     checkType = (item)=>
@@ -203,7 +203,7 @@ class ComponentDriverDSL
   data_processor: (fn) ->
     @raw_data_processor = new RawDataProcessor(fn)
 
-  getResult: ->
+  validate: ->
     all_errors = [].concat @errors
     valid_actions = {}
     valid_states = {}
@@ -213,11 +213,11 @@ class ComponentDriverDSL
         all_errors.push "Driver #{field}() is required"
 
     for own name, action of @actions
-      action = action.getResult()
+      action = action.validate()
       if action.errors.length > 0
         all_errors = all_errors.concat(action.errors)
       else
-        valid_actions[name]= @actions[name]
+        valid_actions[name]= action
 
     isValidState = (name, state)=>
       if state.permitted_actions.length == 0
@@ -242,7 +242,7 @@ class ComponentDriverDSL
     if !@raw_data_processor?
       all_errors.push "data_processor() not provided"
     else
-      processor = @raw_data_processor.getResult()
+      processor = @raw_data_processor.validate()
       if  processor.errors.length > 0
         all_errors = all_errors.concat(processor.errors)
       else
