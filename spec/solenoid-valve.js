@@ -1,5 +1,5 @@
 driver.name('SV35型电磁阀')
-.version('0.1')
+.version('0.0.1')
 .desc('适用于各类液体管路的自动开关控制')
 .author('david')
 .email('david@lianwutech.com');
@@ -21,5 +21,3 @@ driver.data_processor(function(raw_data) {
     state: this.state
   };
 });
-
-if (module) { module.exports = driver; }

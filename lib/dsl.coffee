@@ -76,11 +76,11 @@ class RawDataProcessor
   process: (raw_data) ->
     @fn(raw_data)
 
-  return_data: (@data_format) ->
+  data: (@data_format) ->
     @will_return_data = true
     this
 
-  return_state: ->
+  state: ->
     @will_return_state = true
     this
 
@@ -108,7 +108,7 @@ class RawDataProcessor
             errors.push "allowed return data types are 'number', 'string' and 'boolean'"
 
     if !@will_return_data && !@will_return_state
-      errors.push "data_processor should return_data() or return_state(), or both"
+      errors.push "data_processor should data() or state(), or both"
     else
       if @will_return_data
         retval.will_return_data = true
@@ -144,40 +144,40 @@ class ComponentDriverDSL
     @errors.push(msg);
 
   name: (str) ->
-    @fields.name = str
     @field_given.name = true
+    @fields.name = str
     this
 
   desc: (str) ->
-    @fields.desc = str
     @field_given.desc = true
+    @fields.desc = str
     this
 
   version: (str) ->
-    FORMAT = /\d\.\d/
+    @field_given.version = true
+    FORMAT = /^\d\.\d\.\d$/
     if str.match FORMAT
       @fields.version = str
-      @field_given.version = true
     else
       this.addError 'Driver version is malformed'
     this
 
   author: (str) ->
-    @fields.author = str
     @field_given.author = true
+    @fields.author = str
     this
 
   email: (str) ->
+    @field_given.email = true
     FORMAT = ///
-    [\w\.]+
-    @
-    [\w]+
-    \.
-    [a-zA-Z]+
+      [\w\.]+
+      @
+      [\w]+
+      \.
+      [a-zA-Z]+
     ///
     if str.match FORMAT
       @fields.email = str
-      @field_given.email = true
     else
       this.addError 'Driver email is malformed'
     this

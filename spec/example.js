@@ -1,5 +1,5 @@
 driver.name('iRobot型人形机器人')
-.version('0.1')
+.version('0.0.1')
 .desc('初代版本')
 .author('david')
 .email('david@lianwutech.com');
@@ -26,22 +26,16 @@ driver.action('set_speed_range', '设置移动速度的范围', function(min, ma
   step: 5
 });
 
-driver.state('moving', '移动中')
-.permit('stop', 'set_speed_range');
-
-driver.state('stopped', '已停止')
-.permit('move', 'set_speed_range');
-
 driver.data_processor(function(raw_data) {
   return {
     data: { direction: '东', speed: 12.5, raw: raw_data },
     state: 'moving'
   };
 })
-.return_data({
+.data({
   "raw": { "name": "原始数据", "type": "string" },
   "direction": { "name": "方向", "type": "string" },
   "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" },
-});
-
-if (typeof module !== 'undefined') { module.exports = driver; }
+})
+.state('moving', '移动中', ['stop', 'set_speed_range'])
+.state('stopped', '已停止', ['move', 'set_speed_range']);

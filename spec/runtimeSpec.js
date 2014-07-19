@@ -12,7 +12,7 @@ describe("runtime behaviour", function() {
         state: 'none'
       };
     })
-    .return_data({
+    .data({
       "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" }
     });
   });
