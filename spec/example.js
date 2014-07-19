@@ -5,13 +5,16 @@ driver.name('iRobot型人形机器人')
 .email('david@lianwutech.com');
 
 driver.action('move', '移动', function(direction) {
+  return "MOVE"
 })
 .parameter('direction', '移动方向', 'enum', ['东', '南', '西', '北']);
 
 driver.action('stop', '停下', function() {
+  return "STOP";
 });
 
 driver.action('set_speed_range', '设置移动速度的范围', function(min, max) {
+  return "SET_SPEED_RANGE";
 })
 .parameter('min', '最低速度', 'number', {
   unit: 'km',

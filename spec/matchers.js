@@ -52,17 +52,18 @@ var customMatchers = {
         var result = {};
         actual = actual.validate();
         function checkErrors() {
-          if (actual.errors.length === 0) return false;
+          if (!actual.errors) return false;
           if (typeof expected === "undefined" || expected === null) return true;
           return _.some(actual.errors, function(msg) {
             return _.contains(msg, expected);
           });
         }
         result.pass = checkErrors();
+        expected = expected ? " '" + expected + "'" : "";
         if (!result.pass) {
-          result.message =  "Expected " + JSON.stringify(actual) + " to have error message '" + expected + "'";
+          result.message =  "Expected " + JSON.stringify(actual) + " to have error message" + expected;
         } else {
-          result.message =  "Expected " + JSON.stringify(actual) + " to not have error message '" + expected + "'";
+          result.message =  "Expected " + JSON.stringify(actual) + " to not have error message" + expected;
         }
         return result;
       }

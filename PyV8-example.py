@@ -13,7 +13,7 @@ meta_data = json.loads(ctxt.locals.meta_data)
 print "meta data:"
 print meta_data["fields"]
 print "errors:"
-print meta_data["errors"]
+print meta_data.get("errors")
 print "actions:"
 print meta_data["actions"]
 print "states:"

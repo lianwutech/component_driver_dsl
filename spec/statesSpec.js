@@ -6,43 +6,34 @@ describe("states", function() {
   });
   it("should add valid state", function() {
     driver.action('close', '打开阀门', function() { });
-    driver.state('open', '打开状态').permit('close');
+    driver.data_processor(function(raw){}).state('open', '打开状态', ['close']);
     expect(driver).toHaveState('open');
   });
   it("should not add state without name", function() {
-    driver.state(' ', '打开状态');
-    expect(driver).not.toHaveState(' ');
-    expect(driver).toHaveError('Please call state(name, desc)');
+    driver.data_processor(function(raw){}).state(' ', '打开状态');
+   expect(driver).not.toHaveState(' ');
+    expect(driver).toHaveError('Please call state(name, desc, permitted_actions)');
   });
   it("should not add state with no description", function() {
-    driver.state('open', ' ');
+    driver.data_processor(function(raw){}).state('open', ' ');
     expect(driver).not.toHaveState('open');
-    expect(driver).toHaveError('Please call state(name, desc)');
+    expect(driver).toHaveError('Please call state(name, desc, permitted_actions)');
   });
   it("should have at least one action", function() {
-    driver.state('open', '打开状态');
+    driver.data_processor(function(raw){}).state('open', '打开状态');
     expect(driver).not.toHaveState('open');
-    expect(driver).toHaveError("State 'open' has no permitted action");
+    expect(driver).toHaveError('Please call state(name, desc, permitted_actions)');
   });
   describe("permit()", function() {
     it("should not add nonexist actions", function() {
-      state = driver.state('open', '打开状态');
-      state.permit('wtf?');
+      state = driver.data_processor(function(raw){}).state('open', '打开状态', ['wtf?']);
       expect(driver).not.toHaveState('open');
       expect(driver).toHaveError("State 'open': can't permit nonexist action 'wtf?'");
     });
     it("can add multiple actions", function() {
-      state = driver.state('open', '打开状态');
       driver.action('close', '打开阀门', function() { });
       driver.action('explode', '让阀门爆炸', function() { });
-      state.permit('close', 'explode');
-      expect(driver).toHaveState('open');
-    });
-    it("can be chained", function() {
-      state = driver.state('open', '打开状态');
-      driver.action('close', '打开阀门', function() { });
-      driver.action('explode', '让阀门爆炸', function() { });
-      state.permit('close').permit('explode');
+      state = driver.data_processor(function(raw){}).state('open', '打开状态', ['close', 'explode']);
       expect(driver).toHaveState('open');
     });
   });

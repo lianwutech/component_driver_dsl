@@ -24,7 +24,7 @@ describe("data processor", function() {
   });
   it("can also return state", function() {
     var processor = driver.data_processor(function(raw) {});
-    processor.state();
+    processor.state('open', '打开状态', ['close']);
     expect(processor).not.toHaveError();
     expect(processor.validate().will_return_state).toBe(true);
   });
@@ -32,7 +32,7 @@ describe("data processor", function() {
     var processor = driver.data_processor(function(raw) {});
     processor.data({
       "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" },
-    }).state();
+    }).state('open', '打开状态', ['close']);
     expect(processor).not.toHaveError();
     expect(processor.validate().data_format).toBeTruthy();
     expect(processor.validate().will_return_data).toBe(true);

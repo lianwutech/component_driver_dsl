@@ -5,7 +5,6 @@ describe("runtime behaviour", function() {
     driver = new DSL();
   });
   beforeEach(function() {
-    driver.state('none', '没有状态', []);
     driver.data_processor(function(raw) {
       return {
         data: { x: parseInt(raw.substring(0,2), 16), y: parseInt(raw.substring(2,4), 16) },
@@ -14,7 +13,7 @@ describe("runtime behaviour", function() {
     })
     .data({
       "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" }
-    });
+    }).state('none', '没有状态', []);
   });
   it("should return valid data and state", function() {
     var result = driver.process_data("CCFF");

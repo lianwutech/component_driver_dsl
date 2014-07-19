@@ -55,23 +55,15 @@ class Action
     for name in @parameter_names
       if !@parameters[name]?
         all_errors.push "Parameter '#{name}' not defined for action '#{@name}'"
+    retval = { parameters: @parameters }
+    if all_errors.length > 0 then retval.errors = all_errors
 
-    return {
-      parameters: @parameters
-      errors: all_errors
-    }
-
-class State
-  constructor: ->
-    @permitted_actions = []
-
-  permit: ->
-    for action in arguments
-      @permitted_actions.push(action)
-    return this
+    return retval
 
 class RawDataProcessor
   constructor: (@fn)->
+    @states = {}
+    @errors = []
 
   process: (raw_data) ->
     @fn(raw_data)
@@ -80,47 +72,54 @@ class RawDataProcessor
     @will_return_data = true
     this
 
-  state: ->
+  state: (name, desc, permitted_actions) ->
+    if typeof(name) != 'string' || name.trim().length == 0 ||
+       typeof(desc) != 'string' || desc.trim().length == 0 ||
+       !Array.isArray(permitted_actions) || permitted_actions.length == 0
+      @errors.push "Please call state(name, desc, permitted_actions)"
+    else
+      @states[name] = {name: name, desc: desc, permitted_actions: permitted_actions}
+
     @will_return_state = true
     this
 
   validate: ->
-    errors = []
     retval = {}
     checkType = (item)=>
         switch item.type
           when "number"
             if typeof(item.unit) != 'string' || item.unit.trim().length == 0
-              errors.push "data type 'number' should have unit"
+              @errors.push "data type 'number' should have unit"
             else
               if !item.decimals? then item.decimals = 0
               if typeof(item.decimals) != 'number' ||
                     item.decimals % 1 != 0 ||
                     !(0 <= item.decimals <= 9)
-                errors.push "decimals of data type 'number' should within range [0..9]"
+                @errors.push "decimals of data type 'number' should within range [0..9]"
           when "boolean"
             if typeof(item["true"]) != 'string' || item["true"].trim().length == 0 ||
                typeof(item["false"]) != 'string' || item["false"].trim().length == 0
-              errors.push "should specify meaning for 'true' and 'false' of boolean type"
+              @errors.push "should specify meaning for 'true' and 'false' of boolean type"
           when "string"
             null
           else
-            errors.push "allowed return data types are 'number', 'string' and 'boolean'"
+            @errors.push "allowed return data types are 'number', 'string' and 'boolean'"
 
     if !@will_return_data && !@will_return_state
-      errors.push "data_processor should data() or state(), or both"
+      @errors.push "data_processor should data() or state(), or both"
     else
       if @will_return_data
         retval.will_return_data = true
         retval.data_format = @data_format
       for own key, item of @data_format
         if typeof(item.name) != 'string' || item.name.trim().length == 0
-          errors.push "returned data '#{key}' should have name"
+          @errors.push "returned data '#{key}' should have name"
         else if typeof(item.type) != 'string' || item.type.trim().length == 0
-          errors.push "returned data '#{key}' should have type"
+          @errors.push "returned data '#{key}' should have type"
         else checkType(item)
       retval.will_return_state = !!@will_return_state
-    retval.errors = errors
+    retval.states = @states
+    if @errors.length > 0 then retval.errors = @errors
     return retval;
 
 class ComponentDriverDSL
@@ -190,13 +189,6 @@ class ComponentDriverDSL
     else
       @actions[name] = new Action(name, desc, fn)
 
-  state: (name, desc) ->
-    if typeof(name) != 'string' || name.trim().length == 0 ||
-       typeof(desc) != 'string' || desc.trim().length == 0
-      this.addError "Please call state(name, desc)"
-    else
-      @states[name] = new State(name, desc)
-
   translate_action: (name, parameters...) ->
     @actions[name].fn(parameters)
 
@@ -205,50 +197,49 @@ class ComponentDriverDSL
 
   validate: ->
     all_errors = [].concat @errors
-    valid_actions = {}
-    valid_states = {}
 
     for own field, given of @field_given
       if !given
         all_errors.push "Driver #{field}() is required"
 
+    valid_actions = {}
     for own name, action of @actions
       action = action.validate()
-      if action.errors.length > 0
+      if action.errors?
         all_errors = all_errors.concat(action.errors)
       else
         valid_actions[name]= action
 
-    isValidState = (name, state)=>
-      if state.permitted_actions.length == 0
-        all_errors.push "State '#{name}' has no permitted action"
-        return false
-      else
-        for action in state.permitted_actions
-          if  !valid_actions[action]?
-            all_errors.push "State '#{name}': can\'t permit nonexist action '#{action}'"
-            return false
-      return true
-
-    for own name, state of @states
-      valid_states[name] = state if isValidState(name, state)
-
     retval = {
       fields: @fields
       actions: valid_actions
-      states: valid_states
     }
 
     if !@raw_data_processor?
       all_errors.push "data_processor() not provided"
     else
       processor = @raw_data_processor.validate()
-      if  processor.errors.length > 0
+      if processor.errors
         all_errors = all_errors.concat(processor.errors)
-      else
-        retval.data_processor = processor
 
-    retval.errors = all_errors
+      valid_states = {}
+      isValidState = (name, state)=>
+        if state.permitted_actions.length == 0
+          all_errors.push "State '#{name}' has no permitted action"
+          return false
+        else
+          for action in state.permitted_actions
+            if  !valid_actions[action]?
+              all_errors.push "State '#{name}': can\'t permit nonexist action '#{action}'"
+              return false
+        return true
+      for own name, state of processor.states
+        valid_states[name] = state if isValidState(name, state)
+
+      retval.data_processor = processor
+      retval.states = valid_states
+
+    if all_errors.length > 0 then retval.errors = all_errors
     return retval
 
   process_data: (hex_raw_data) ->
