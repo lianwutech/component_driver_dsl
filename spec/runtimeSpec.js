@@ -26,7 +26,7 @@ describe("runtime behaviour", function() {
     driver.action('move', '移动', function() {
       return '13FE';
     });
-    var result = driver.execute('move');
+    var result = driver.translate_action('move');
     expect(result).toEqual('13FE');
   });
 });

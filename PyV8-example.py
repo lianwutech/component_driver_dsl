@@ -23,6 +23,6 @@ print "process_data:"
 result = ctxt.eval("JSON.stringify(driver.process_data(\"A4B83290DE\"));")
 print json.loads(result)
 
-print "execute:"
-result = ctxt.eval("driver.execute('move')")
+print "translate_action:"
+result = ctxt.eval("driver.translate_action('move')")
 print result

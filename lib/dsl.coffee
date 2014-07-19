@@ -197,7 +197,7 @@ class ComponentDriverDSL
     else
       @states[name] = new State(name, desc)
 
-  execute: (name, parameters...) ->
+  translate_action: (name, parameters...) ->
     @actions[name].fn(parameters)
 
   data_processor: (fn) ->
