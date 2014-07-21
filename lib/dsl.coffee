@@ -1,3 +1,16 @@
+CRITICAL = 50
+ERROR = 40
+WARNING = 30
+INFO = 20
+DEBUG = 10
+
+if !log? then log = () ->
+critical = (msg) -> log(CRITICAL, msg)
+error = (msg) -> log(ERROR, msg)
+warning = (msg) -> log(WARNING, msg)
+info = (msg) -> log(INFO, msg)
+debug = (msg) -> log(DEBUG, msg)
+
 # ref http://stackoverflow.com/questions/1007981/how-to-get-function-parameter-names-values-dynamically-from-javascript
 STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
 ARGUMENT_NAMES = /([^\s,]+)/g;
@@ -239,7 +252,10 @@ class ComponentDriverDSL
       retval.data_processor = processor
       retval.states = valid_states
 
-    if all_errors.length > 0 then retval.errors = all_errors
+    if all_errors.length > 0
+      retval.errors = all_errors
+      for err in all_errors
+        error err
     return retval
 
   process_data: (hex_raw_data) ->
