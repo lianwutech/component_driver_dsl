@@ -58,14 +58,15 @@ class Action
       @parameters[name] = {
         desc: desc
         type: type
-        options: options
+        options: options,
+        sequence: @parameter_names.indexOf(name)
       }
 
     return this
 
   validate: ->
     all_errors = [].concat @errors
-    for name in @parameter_names
+    for name, index in @parameter_names
       if !@parameters[name]?
         all_errors.push "Parameter '#{name}' not defined for action '#{@name}'"
     retval = { parameters: @parameters }
@@ -202,8 +203,16 @@ class ComponentDriverDSL
     else
       @actions[name] = new Action(name, desc, fn)
 
-  translate_action: (name, parameters...) ->
-    @actions[name].fn(parameters)
+  translate_action: (name, parameters) ->
+    action = @actions[name]
+    if !action?
+      error "Action #{name} doesn't exist"
+    else
+      real_params = []
+      for param_name, value of parameters
+        param = action.parameters[param_name]
+        if param? then real_params[param.sequence] = value
+      action.fn.apply(null, real_params)
 
   data_processor: (fn) ->
     @raw_data_processor = new RawDataProcessor(fn)

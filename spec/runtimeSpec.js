@@ -21,12 +21,25 @@ describe("runtime behaviour", function() {
     expect(result.state).toEqual("none");
     expect(result.error).toBeUndefined();
   });
-  it("should return valid data and state", function() {
+  it("should translate action", function() {
     driver.action('move', '移动', function() {
       return '13FE';
     });
     var result = driver.translate_action('move');
     expect(result).toEqual('13FE');
+  });
+  it("should not translate nonexist action", function() {
+    var result = driver.translate_action('move');
+    expect(result).toBeUndefined();
+  });
+  it("should translate action with multiple arguments", function() {
+    driver.action('set_threshold', '设置上下限', function(min, max) {
+      return (min*0x100 + max).toString(16);
+     })
+    .parameter('min', 'param description', 'number', {min: 1, max: 100, step: 1})
+    .parameter('max', 'param description', 'number', {min: 1, max: 100, step: 1});
+    var result = driver.translate_action('set_threshold', {max: 90, min: 10});
+    expect(result).toEqual('a5a');
   });
 });
 

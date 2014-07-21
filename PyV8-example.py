@@ -23,6 +23,11 @@ print meta_data["actions"]
 print "states:"
 print meta_data["states"]
 
+print "init:"
+devices_dict = {'343dsadfas': {'device_type': 'adsfas'}}
+ctxt.eval("var devices_dict = %s" % json.dumps(devices_dict))
+ctxt.eval("log(10, JSON.stringify(devices_dict));")
+
 print "process_data:"
 result = ctxt.eval("JSON.stringify(driver.process_data(\"A4B83290DE\"));")
 print json.loads(result)
