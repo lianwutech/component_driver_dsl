@@ -3,6 +3,10 @@ describe("runtime behaviour", function() {
     jasmine.addMatchers(require('./matchers'));
     DSL = require('../lib/dsl.js');
     driver = new DSL();
+    devices_dict = {
+      '3FDASFE': { device_name: 'ASDFASDF' },
+      '1DDF34F': { device_name: 'dasfadsf' }
+    };
   });
   beforeEach(function() {
     driver.data_processor(function(raw) {
@@ -26,7 +30,7 @@ describe("runtime behaviour", function() {
       return '13FE';
     });
     var result = driver.translate_action('move');
-    expect(result).toEqual('13FE');
+    expect(result).toEqual([ { device_id : '3FDASFE', ctrl_msg : '13FE' }, { device_id : '1DDF34F', ctrl_msg : '13FE' } ]);
   });
   it("should not translate nonexist action", function() {
     var result = driver.translate_action('move');
@@ -39,7 +43,7 @@ describe("runtime behaviour", function() {
     .parameter('min', 'param description', 'number', {min: 1, max: 100, step: 1})
     .parameter('max', 'param description', 'number', {min: 1, max: 100, step: 1});
     var result = driver.translate_action('set_threshold', {max: 90, min: 10});
-    expect(result).toEqual('a5a');
+    expect(result).toEqual([ { device_id : '3FDASFE', ctrl_msg : 'a5a' }, { device_id : '1DDF34F', ctrl_msg : 'a5a' } ]);
   });
 });
 

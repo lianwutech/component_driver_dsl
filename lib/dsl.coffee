@@ -212,7 +212,23 @@ class ComponentDriverDSL
       for param_name, value of parameters
         param = action.parameters[param_name]
         if param? then real_params[param.sequence] = value
-      action.fn.apply(null, real_params)
+      result = action.fn.apply(null, real_params)
+
+      result_array = []
+      if typeIsArray(result)
+        for item in result
+          if 'device_id' not in item.keys() ||
+             'ctrl_msg' not in item.keys()
+            error "action '#{name}' should return array of {device_id, ctrl_msg}"
+          else
+            result_array.push(item)
+      else if typeof(result) == 'string'
+        for device_id of devices_dict
+          result_array.push({device_id: device_id, ctrl_msg: result})
+      else
+        error "action '#{name}' should return array or string"
+
+      result_array
 
   data_processor: (fn) ->
     @raw_data_processor = new RawDataProcessor(fn)
