@@ -16,7 +16,7 @@ driver.state('open', '已打开').permit('close');
 
 driver.state('closed', '已关闭').permit('open');
 
-driver.data_processor(function(raw_data) {
+driver.data_processor(function(device_id, device_type, timestamp, raw_data) {
   return {
     state: this.state
   };

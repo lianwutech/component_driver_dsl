@@ -6,15 +6,15 @@ describe("data processor", function() {
   });
   it("should check if data_processor() called", function() {
     expect(driver).toHaveError("data_processor() not provided");
-    driver.data_processor(function(raw) {});
+    driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
     expect(driver).not.toHaveError("data_processor() not provided");
   });
   it("should data() or state(), or both", function() {
-    var processor = driver.data_processor(function(raw) {});
-    expect(processor).toHaveError("data_processor should data() or state(), or both");
+    var processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
+    expect(processor).toHaveError("data_processor should have data() or state(), or both");
   });
   it("should provide return data format", function() {
-    var processor = driver.data_processor(function(raw) {});
+    var processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
     processor.data({
       "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" },
     });
@@ -23,13 +23,13 @@ describe("data processor", function() {
     expect(processor.validate().will_return_data).toBe(true);
   });
   it("can also return state", function() {
-    var processor = driver.data_processor(function(raw) {});
+    var processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
     processor.state('open', '打开状态', ['close']);
     expect(processor).not.toHaveError();
     expect(processor.validate().will_return_state).toBe(true);
   });
   it("or both", function() {
-    var processor = driver.data_processor(function(raw) {});
+    var processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
     processor.data({
       "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" },
     }).state('open', '打开状态', ['close']);
@@ -40,7 +40,7 @@ describe("data processor", function() {
   });
   describe("data format", function() {
     beforeEach(function() {
-      processor = driver.data_processor(function(raw) {});
+      processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
     });
     it("should allow number, string and boolean type", function() {
       processor.data({

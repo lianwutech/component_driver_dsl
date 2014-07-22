@@ -4,7 +4,7 @@ driver.name('TS35型温度传感器')
 .author('david')
 .email('david@lianwutech.com');
 
-driver.data_processor(function(raw_data) {
+driver.data_processor(function(device_id, device_type, timestamp, raw_data) {
   return {
     data: { 'temp': 39.5 }
   };

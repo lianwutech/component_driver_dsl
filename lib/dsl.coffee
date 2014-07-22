@@ -79,8 +79,8 @@ class RawDataProcessor
     @states = {}
     @errors = []
 
-  process: (raw_data) ->
-    @fn(raw_data)
+  process: (device_id, device_type, timestamp, raw_data) ->
+    @fn(device_id, device_type, timestamp, raw_data)
 
   data: (@data_format) ->
     @will_return_data = true
@@ -120,7 +120,7 @@ class RawDataProcessor
             @errors.push "allowed return data types are 'number', 'string' and 'boolean'"
 
     if !@will_return_data && !@will_return_state
-      @errors.push "data_processor should data() or state(), or both"
+      @errors.push "data_processor should have data() or state(), or both"
     else
       if @will_return_data
         retval.will_return_data = true
@@ -231,7 +231,20 @@ class ComponentDriverDSL
       result_array
 
   data_processor: (fn) ->
-    @raw_data_processor = new RawDataProcessor(fn)
+
+    arrayEquals = (s, o) ->
+      return true if s is o
+      return false if s.length isnt o.length
+      for i in [0..s.length]
+        return false if s[i] isnt o[i]
+      true
+
+    required_params = ['device_id', 'device_type', 'timestamp', 'raw_data']
+    params = getParamNames(fn)
+    if (arrayEquals(params, required_params))
+      @raw_data_processor = new RawDataProcessor(fn)
+    else
+      error "data_processor should have exactly 4 parameters: #{required_params}"
 
   validate: ->
     all_errors = [].concat @errors
@@ -283,8 +296,8 @@ class ComponentDriverDSL
         error err
     return retval
 
-  process_data: (hex_raw_data) ->
-    @raw_data_processor.process(hex_raw_data)
+  process_data: (device_id, device_type, timestamp, raw_data) ->
+    @raw_data_processor.process(device_id, device_type, timestamp, raw_data)
 
 if module?
   module.exports = ComponentDriverDSL;

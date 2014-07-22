@@ -9,9 +9,9 @@ describe("runtime behaviour", function() {
     };
   });
   beforeEach(function() {
-    driver.data_processor(function(raw) {
+    driver.data_processor(function(device_id, device_type, timestamp, raw_data) {
       return {
-        data: { x: parseInt(raw.substring(0,2), 16), y: parseInt(raw.substring(2,4), 16) },
+        data: { x: parseInt(raw_data.substring(0,2), 16), y: parseInt(raw_data.substring(2,4), 16) },
         state: 'none'
       };
     })
@@ -20,7 +20,7 @@ describe("runtime behaviour", function() {
     }).state('none', '没有状态', []);
   });
   it("should return valid data and state", function() {
-    var result = driver.process_data("CCFF");
+    var result = driver.process_data("DEVICE_ID", 0, "2013-33-33", "CCFF");
     expect(result.data).toEqual({x: 204, y: 255});
     expect(result.state).toEqual("none");
     expect(result.error).toBeUndefined();
