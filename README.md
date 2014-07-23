@@ -1,4 +1,4 @@
-driver_checker
+component_driver_dsl
 ==============
 The DSL for writing a component driver, see `spec/example.js` for details.
 
