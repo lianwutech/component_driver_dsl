@@ -1,7 +1,7 @@
 describe("Driver actions", function() {
   beforeEach(function() {
     jasmine.addMatchers(require('./matchers'));
-    DSL = require('../lib/dsl.js');
+    DSL = require('../dsl.js');
   });
   it("should load example temp sensor driver", function() {
     driver = new DSL();

@@ -1,7 +1,7 @@
 describe("meta data", function() {
   beforeEach(function() {
     jasmine.addMatchers(require('./matchers'));
-    DSL = require('../lib/dsl.js');
+    DSL = require('../dsl.js');
     driver = new DSL();
   });
   it("should check if driver name supplied", function() {

@@ -1,7 +1,7 @@
 describe("runtime behaviour", function() {
   beforeEach(function() {
     jasmine.addMatchers(require('./matchers'));
-    DSL = require('../lib/dsl.js');
+    DSL = require('../dsl.js');
     driver = new DSL();
     devices_dict = {
       '3FDASFE': { device_name: 'ASDFASDF' },

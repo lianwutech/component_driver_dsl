@@ -1,7 +1,7 @@
 describe("actions", function() {
   beforeEach(function() {
     jasmine.addMatchers(require('./matchers'));
-    DSL = require('../lib/dsl.js');
+    DSL = require('../dsl.js');
     driver = new DSL();
   });
   it("should add action with valid name, desc and body", function() {

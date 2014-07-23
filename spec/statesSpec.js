@@ -1,7 +1,7 @@
 describe("states", function() {
   beforeEach(function() {
     jasmine.addMatchers(require('./matchers'));
-    DSL = require('../lib/dsl.js');
+    DSL = require('../dsl.js');
     driver = new DSL();
   });
   it("should add valid state", function() {
