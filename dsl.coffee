@@ -212,7 +212,10 @@ class ComponentDriverDSL
       for param_name, value of parameters
         param = action.parameters[param_name]
         if param? then real_params[param.sequence] = value
-      result = action.fn.apply(null, real_params)
+      try
+        result = action.fn.apply(null, real_params)
+      catch err
+        error err
 
       result_array = []
       if typeIsArray(result)
@@ -297,7 +300,10 @@ class ComponentDriverDSL
     return retval
 
   process_data: (device_id, device_type, timestamp, raw_data) ->
-    @raw_data_processor.process(device_id, device_type, timestamp, raw_data)
+    try
+      @raw_data_processor.process(device_id, device_type, timestamp, raw_data)
+    catch err
+      error err
 
 if module?
   module.exports = ComponentDriverDSL;

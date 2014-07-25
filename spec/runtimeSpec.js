@@ -2,6 +2,8 @@ describe("runtime behaviour", function() {
   beforeEach(function() {
     jasmine.addMatchers(require('./matchers'));
     DSL = require('../dsl.js');
+    log = function(level, msg) { };
+    spyOn(global, 'log');
     driver = new DSL();
     devices_dict = {
       '3FDASFE': { device_name: 'ASDFASDF' },
@@ -25,6 +27,13 @@ describe("runtime behaviour", function() {
     expect(result.state).toEqual("none");
     expect(result.error).toBeUndefined();
   });
+  it("should catch js errors in data processor", function() {
+    driver.data_processor(function(device_id, device_type, timestamp, raw_data) {
+      throw "unknown error";
+    });
+    var result = driver.process_data("DEVICE_ID", 0, "2013-33-33", "CCFF");
+    expect(global.log).toHaveBeenCalledWith(40, 'unknown error');
+  });
   it("should translate action", function() {
     driver.action('move', '移动', function() {
       return '13FE';
@@ -39,7 +48,7 @@ describe("runtime behaviour", function() {
   it("should translate action with multiple arguments", function() {
     driver.action('set_threshold', '设置上下限', function(min, max) {
       return (min*0x100 + max).toString(16);
-     })
+    })
     .parameter('min', 'param description', 'number', {min: 1, max: 100, step: 1})
     .parameter('max', 'param description', 'number', {min: 1, max: 100, step: 1});
     var result = driver.translate_action('set_threshold', {max: 90, min: 10});

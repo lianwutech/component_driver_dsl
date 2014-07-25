@@ -296,7 +296,7 @@ ComponentDriverDSL = (function() {
   };
 
   ComponentDriverDSL.prototype.translate_action = function(name, parameters) {
-    var action, device_id, item, param, param_name, real_params, result, result_array, value, _i, _len;
+    var action, device_id, err, item, param, param_name, real_params, result, result_array, value, _i, _len;
     action = this.actions[name];
     if (action == null) {
       return error("Action " + name + " doesn't exist");
@@ -309,7 +309,12 @@ ComponentDriverDSL = (function() {
           real_params[param.sequence] = value;
         }
       }
-      result = action.fn.apply(null, real_params);
+      try {
+        result = action.fn.apply(null, real_params);
+      } catch (_error) {
+        err = _error;
+        error(err);
+      }
       result_array = [];
       if (typeIsArray(result)) {
         for (_i = 0, _len = result.length; _i < _len; _i++) {
@@ -436,7 +441,13 @@ ComponentDriverDSL = (function() {
   };
 
   ComponentDriverDSL.prototype.process_data = function(device_id, device_type, timestamp, raw_data) {
-    return this.raw_data_processor.process(device_id, device_type, timestamp, raw_data);
+    var err;
+    try {
+      return this.raw_data_processor.process(device_id, device_type, timestamp, raw_data);
+    } catch (_error) {
+      err = _error;
+      return error(err);
+    }
   };
 
   return ComponentDriverDSL;

@@ -5,15 +5,15 @@ var coffee = require('gulp-coffee');
 var watch = require('gulp-watch');
 
 var paths = {
-  coffee: ['lib/*.coffee'],
-  js: ['lib/*.js'],
+  coffee: ['*.coffee'],
+  js: ['*.js'],
   specs: ['spec/*Spec.js']
 };
 
 gulp.task('coffee', function() {
   return gulp.src(paths.coffee)
     .pipe(coffee({bare: true}).on('error', gutil.log))
-    .pipe(gulp.dest('./lib/'));
+    .pipe(gulp.dest('.'));
 });
 
 gulp.task('test', ['coffee'], function() {
