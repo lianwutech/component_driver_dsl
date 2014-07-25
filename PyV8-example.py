@@ -29,8 +29,8 @@ ctxt.eval("var devices_dict = %s" % json.dumps(devices_dict))
 ctxt.eval("log(10, JSON.stringify(devices_dict));")
 
 print "process_data:"
-result = ctxt.eval("JSON.stringify(driver.process_data('8D4B6F_1', 1101, '2014-07-25 09:41:43', '00'));")
-print json.loads(result)
+result = ctxt.eval("var result = JSON.stringify(driver.process_data('8D4B6F_1', 1101, '2014-07-25 09:41:43', '00'));")
+print json.loads(ctxt.locals.result)
 
 print "translate_action:"
 result = ctxt.eval("driver.translate_action('move')")
