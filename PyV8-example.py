@@ -7,7 +7,7 @@ class Global(PyV8.JSClass):
         print "level %d: %s" % (level, msg)
 ctxt = PyV8.JSContext(Global())
 ctxt.enter()
-driver = open('lib/dsl.js', 'r').read()
+driver = open('dsl.js', 'r').read()
 ctxt.eval(driver)
 example = open('spec/example.js', 'r').read()
 ctxt.eval(example)
@@ -29,7 +29,7 @@ ctxt.eval("var devices_dict = %s" % json.dumps(devices_dict))
 ctxt.eval("log(10, JSON.stringify(devices_dict));")
 
 print "process_data:"
-result = ctxt.eval("JSON.stringify(driver.process_data(\"A4B83290DE\"));")
+result = ctxt.eval("JSON.stringify(driver.process_data('8D4B6F_1', 1101, '2014-07-25 09:41:43', '00'));")
 print json.loads(result)
 
 print "translate_action:"
