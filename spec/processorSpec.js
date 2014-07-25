@@ -1,6 +1,8 @@
 describe("data processor", function() {
   beforeEach(function() {
     jasmine.addMatchers(require('./matchers'));
+    log = function(level, msg) { };
+    spyOn(global, 'log');
     DSL = require('../dsl.js');
     driver = new DSL();
   });

@@ -4,7 +4,6 @@ WARNING = 30
 INFO = 20
 DEBUG = 10
 
-if !log? then log = () ->
 critical = (msg) -> log(CRITICAL, msg)
 error = (msg) -> log(ERROR, msg)
 warning = (msg) -> log(WARNING, msg)
@@ -214,8 +213,8 @@ class ComponentDriverDSL
         if param? then real_params[param.sequence] = value
       try
         result = action.fn.apply(null, real_params)
-      catch err
-        error err
+      catch e
+        error e.name + ': ' + e.message
 
       result_array = []
       if typeIsArray(result)
@@ -302,8 +301,8 @@ class ComponentDriverDSL
   process_data: (device_id, device_type, timestamp, raw_data) ->
     try
       @raw_data_processor.process(device_id, device_type, timestamp, raw_data)
-    catch err
-      error err
+    catch e
+      error e.name + ': ' + e.message
 
 if module?
   module.exports = ComponentDriverDSL;

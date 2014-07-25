@@ -1,9 +1,9 @@
 describe("runtime behaviour", function() {
   beforeEach(function() {
     jasmine.addMatchers(require('./matchers'));
-    DSL = require('../dsl.js');
     log = function(level, msg) { };
     spyOn(global, 'log');
+    DSL = require('../dsl.js');
     driver = new DSL();
     devices_dict = {
       '3FDASFE': { device_name: 'ASDFASDF' },
@@ -29,10 +29,10 @@ describe("runtime behaviour", function() {
   });
   it("should catch js errors in data processor", function() {
     driver.data_processor(function(device_id, device_type, timestamp, raw_data) {
-      throw "unknown error";
+      throw new Error("fake error");
     });
     var result = driver.process_data("DEVICE_ID", 0, "2013-33-33", "CCFF");
-    expect(global.log).toHaveBeenCalledWith(40, 'unknown error');
+    expect(global.log).toHaveBeenCalledWith(40, 'Error: fake error');
   });
   it("should translate action", function() {
     driver.action('move', '移动', function() {
@@ -53,6 +53,13 @@ describe("runtime behaviour", function() {
     .parameter('max', 'param description', 'number', {min: 1, max: 100, step: 1});
     var result = driver.translate_action('set_threshold', {max: 90, min: 10});
     expect(result).toEqual([ { device_id : '3FDASFE', ctrl_msg : 'a5a' }, { device_id : '1DDF34F', ctrl_msg : 'a5a' } ]);
+  });
+  it("should catch js errors when translate action", function() {
+    driver.action('move', '移动', function() {
+      throw new Error("fake error");
+    });
+    var result = driver.translate_action("move");
+    expect(global.log).toHaveBeenCalledWith(40, 'Error: fake error');
   });
 });
 

@@ -1,4 +1,4 @@
-var ARGUMENT_NAMES, Action, CRITICAL, ComponentDriverDSL, DEBUG, ERROR, INFO, RawDataProcessor, STRIP_COMMENTS, WARNING, critical, debug, driver, error, getParamNames, info, log, typeIsArray, warning,
+var ARGUMENT_NAMES, Action, CRITICAL, ComponentDriverDSL, DEBUG, ERROR, INFO, RawDataProcessor, STRIP_COMMENTS, WARNING, critical, debug, driver, error, getParamNames, info, typeIsArray, warning,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
   __hasProp = {}.hasOwnProperty;
 
@@ -11,10 +11,6 @@ WARNING = 30;
 INFO = 20;
 
 DEBUG = 10;
-
-if (typeof log === "undefined" || log === null) {
-  log = function() {};
-}
 
 critical = function(msg) {
   return log(CRITICAL, msg);
@@ -296,7 +292,7 @@ ComponentDriverDSL = (function() {
   };
 
   ComponentDriverDSL.prototype.translate_action = function(name, parameters) {
-    var action, device_id, err, item, param, param_name, real_params, result, result_array, value, _i, _len;
+    var action, device_id, e, item, param, param_name, real_params, result, result_array, value, _i, _len;
     action = this.actions[name];
     if (action == null) {
       return error("Action " + name + " doesn't exist");
@@ -312,8 +308,8 @@ ComponentDriverDSL = (function() {
       try {
         result = action.fn.apply(null, real_params);
       } catch (_error) {
-        err = _error;
-        error(err);
+        e = _error;
+        error(e.name + ': ' + e.message);
       }
       result_array = [];
       if (typeIsArray(result)) {
@@ -441,12 +437,12 @@ ComponentDriverDSL = (function() {
   };
 
   ComponentDriverDSL.prototype.process_data = function(device_id, device_type, timestamp, raw_data) {
-    var err;
+    var e;
     try {
       return this.raw_data_processor.process(device_id, device_type, timestamp, raw_data);
     } catch (_error) {
-      err = _error;
-      return error(err);
+      e = _error;
+      return error(e.name + ': ' + e.message);
     }
   };
 
