@@ -1,4 +1,7 @@
-from pyv8 import PyV8
+try:
+    from pyv8 import PyV8
+except ImportError:
+    import PyV8
 import json
 
 

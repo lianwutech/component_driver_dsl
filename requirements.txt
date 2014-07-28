@@ -1,1 +1,3 @@
-PyV8>=0.8
+--allow-all-external
+PyV8 [1.0-dev,0.8]
+
