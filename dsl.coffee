@@ -81,7 +81,7 @@ class RawDataProcessor
   process: (device_id, device_type, timestamp, raw_data) ->
     @fn(device_id, device_type, timestamp, raw_data)
 
-  data: (@data_format) ->
+  data: (@data_fields) ->
     @will_return_data = true
     this
 
@@ -103,33 +103,38 @@ class RawDataProcessor
           when "number"
             if typeof(item.unit) != 'string' || item.unit.trim().length == 0
               @errors.push "data type 'number' should have unit"
+              false
             else
               if !item.decimals? then item.decimals = 0
               if typeof(item.decimals) != 'number' ||
                     item.decimals % 1 != 0 ||
                     !(0 <= item.decimals <= 9)
                 @errors.push "decimals of data type 'number' should within range [0..9]"
+                false
+              else true
           when "boolean"
             if typeof(item["true"]) != 'string' || item["true"].trim().length == 0 ||
                typeof(item["false"]) != 'string' || item["false"].trim().length == 0
               @errors.push "should specify meaning for 'true' and 'false' of boolean type"
+              false
+            else true
           when "string"
-            null
+            true
           else
             @errors.push "allowed return data types are 'number', 'string' and 'boolean'"
+            false
 
     if !@will_return_data && !@will_return_state
       @errors.push "data_processor should have data() or state(), or both"
     else
-      if @will_return_data
-        retval.will_return_data = true
-        retval.data_format = @data_format
-      for own key, item of @data_format
+      for own key, item of @data_fields
         if typeof(item.name) != 'string' || item.name.trim().length == 0
           @errors.push "returned data '#{key}' should have name"
         else if typeof(item.type) != 'string' || item.type.trim().length == 0
           @errors.push "returned data '#{key}' should have type"
-        else checkType(item)
+        else if checkType(item)
+          retval.will_return_data = true
+          retval.data_fields = @data_fields
       retval.will_return_state = !!@will_return_state
     retval.states = @states
     if @errors.length > 0 then retval.errors = @errors
@@ -289,8 +294,8 @@ class ComponentDriverDSL
       for own name, state of processor.states
         valid_states[name] = state if isValidState(name, state)
 
-      retval.data_processor = processor
       retval.states = valid_states
+      retval.data_fields = processor.data_fields
 
     if all_errors.length > 0
       retval.errors = all_errors

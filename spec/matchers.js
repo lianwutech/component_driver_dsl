@@ -46,6 +46,21 @@ var customMatchers = {
       }
     };
   },
+  toHaveDataField: function() {
+    return {
+      compare: function(actual, expected) {
+        actual = actual.validate();
+        var result = {};
+        result.pass = (actual.data_fields && actual.data_fields[expected]);
+        if (!result.pass) {
+          result.message =  "Expected " + JSON.stringify(actual) + " to have data field " + expected;
+        } else {
+          result.message =  "Expected " + JSON.stringify(actual) + " to not have data field " + expected;
+        }
+        return result;
+      }
+    };
+  },
   toHaveError: function() {
     return {
       compare: function(actual, expected) {

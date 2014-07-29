@@ -25,6 +25,8 @@ print "actions:"
 print meta_data["actions"]
 print "states:"
 print meta_data["states"]
+print "data fields:"
+print meta_data["data_fields"]
 
 print "init:"
 devices_dict = {'343dsadfas': {'device_type': 'adsfas'}}

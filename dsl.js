@@ -136,8 +136,8 @@ RawDataProcessor = (function() {
     return this.fn(device_id, device_type, timestamp, raw_data);
   };
 
-  RawDataProcessor.prototype.data = function(data_format) {
-    this.data_format = data_format;
+  RawDataProcessor.prototype.data = function(data_fields) {
+    this.data_fields = data_fields;
     this.will_return_data = true;
     return this;
   };
@@ -165,36 +165,40 @@ RawDataProcessor = (function() {
         switch (item.type) {
           case "number":
             if (typeof item.unit !== 'string' || item.unit.trim().length === 0) {
-              return _this.errors.push("data type 'number' should have unit");
+              _this.errors.push("data type 'number' should have unit");
+              return false;
             } else {
               if (item.decimals == null) {
                 item.decimals = 0;
               }
               if (typeof item.decimals !== 'number' || item.decimals % 1 !== 0 || !((0 <= (_ref = item.decimals) && _ref <= 9))) {
-                return _this.errors.push("decimals of data type 'number' should within range [0..9]");
+                _this.errors.push("decimals of data type 'number' should within range [0..9]");
+                return false;
+              } else {
+                return true;
               }
             }
             break;
           case "boolean":
             if (typeof item["true"] !== 'string' || item["true"].trim().length === 0 || typeof item["false"] !== 'string' || item["false"].trim().length === 0) {
-              return _this.errors.push("should specify meaning for 'true' and 'false' of boolean type");
+              _this.errors.push("should specify meaning for 'true' and 'false' of boolean type");
+              return false;
+            } else {
+              return true;
             }
             break;
           case "string":
-            return null;
+            return true;
           default:
-            return _this.errors.push("allowed return data types are 'number', 'string' and 'boolean'");
+            _this.errors.push("allowed return data types are 'number', 'string' and 'boolean'");
+            return false;
         }
       };
     })(this);
     if (!this.will_return_data && !this.will_return_state) {
       this.errors.push("data_processor should have data() or state(), or both");
     } else {
-      if (this.will_return_data) {
-        retval.will_return_data = true;
-        retval.data_format = this.data_format;
-      }
-      _ref = this.data_format;
+      _ref = this.data_fields;
       for (key in _ref) {
         if (!__hasProp.call(_ref, key)) continue;
         item = _ref[key];
@@ -202,8 +206,9 @@ RawDataProcessor = (function() {
           this.errors.push("returned data '" + key + "' should have name");
         } else if (typeof item.type !== 'string' || item.type.trim().length === 0) {
           this.errors.push("returned data '" + key + "' should have type");
-        } else {
-          checkType(item);
+        } else if (checkType(item)) {
+          retval.will_return_data = true;
+          retval.data_fields = this.data_fields;
         }
       }
       retval.will_return_state = !!this.will_return_state;
@@ -423,8 +428,8 @@ ComponentDriverDSL = (function() {
           valid_states[name] = state;
         }
       }
-      retval.data_processor = processor;
       retval.states = valid_states;
+      retval.data_fields = processor.data_fields;
     }
     if (all_errors.length > 0) {
       retval.errors = all_errors;

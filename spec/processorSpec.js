@@ -13,16 +13,16 @@ describe("data processor", function() {
   });
   it("should data() or state(), or both", function() {
     var processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
-    expect(processor).toHaveError("data_processor should have data() or state(), or both");
+    expect(driver).toHaveError("data_processor should have data() or state(), or both");
   });
-  it("should provide return data format", function() {
+  it("should provide return data fields", function() {
     var processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
     processor.data({
       "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" },
     });
     expect(processor).not.toHaveError();
-    expect(processor.validate().data_format).toBeTruthy();
     expect(processor.validate().will_return_data).toBe(true);
+    expect(driver).toHaveDataField("speed");
   });
   it("can also return state", function() {
     var processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
@@ -36,11 +36,11 @@ describe("data processor", function() {
       "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" },
     }).state('open', '打开状态', ['close']);
     expect(processor).not.toHaveError();
-    expect(processor.validate().data_format).toBeTruthy();
+    expect(processor).toHaveDataField("speed");
     expect(processor.validate().will_return_data).toBe(true);
     expect(processor.validate().will_return_state).toBe(true);
   });
-  describe("data format", function() {
+  describe("data fields", function() {
     beforeEach(function() {
       processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
     });
@@ -50,24 +50,30 @@ describe("data processor", function() {
         "direction": { "name": "方向", "type": "string" },
         "has_obstacle": { "name": "障碍物", "type": "boolean", "true": "有", "false": "没有"}
       });
+      expect(processor).toHaveDataField("speed");
+      expect(processor).toHaveDataField("direction");
+      expect(processor).toHaveDataField("has_obstacle");
       expect(processor).not.toHaveError();
     });
     it("should have name supplied", function() {
       processor.data({
         "speed" : { "type": "number" }
       });
+      expect(processor).not.toHaveDataField("speed");
       expect(processor).toHaveError("returned data 'speed' should have name");
     });
     it("should have type supplied", function() {
       processor.data({
         "speed": { "name": "速度" }
       });
+      expect(processor).not.toHaveDataField("speed");
       expect(processor).toHaveError("returned data 'speed' should have type");
     });
     it("should not allow other types", function() {
       processor.data({
         "speed": { "name": "速度", "type": "integer" }
       });
+      expect(processor).not.toHaveDataField("speed");
       expect(processor).toHaveError("allowed return data types are 'number', 'string' and 'boolean'");
     });
     describe("'number'", function() {
@@ -75,18 +81,21 @@ describe("data processor", function() {
         processor.data({
           "speed" : { "name": "速度", "type": "number", "decimals": 2 }
         });
+        expect(processor).not.toHaveDataField("speed");
         expect(processor).toHaveError("data type 'number' should have unit");
       });
       it("decimals is optional but should be integer", function() {
         processor.data({
           "speed" : { "name": "速度", "type": "number", "decimals": "None", "unit": "km" }
         });
+        expect(processor).not.toHaveDataField("speed");
         expect(processor).toHaveError("decimals of data type 'number' should within range [0..9]");
       });
       it("decimals is optional but should in range [0..9]", function() {
         processor.data({
           "speed" : { "name": "速度", "type": "number", "decimals": "11", "unit": "km" }
         });
+        expect(processor).not.toHaveDataField("speed");
         expect(processor).toHaveError("decimals of data type 'number' should within range [0..9]");
       });
     });
@@ -95,6 +104,7 @@ describe("data processor", function() {
         processor.data({
           "has_obstacle": { "name": "障碍物", "type": "boolean" }
         });
+        expect(processor).not.toHaveDataField("has_obstacle");
         expect(processor).toHaveError("should specify meaning for 'true' and 'false' of boolean type");
       });
     });
