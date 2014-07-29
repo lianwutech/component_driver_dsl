@@ -429,7 +429,7 @@ ComponentDriverDSL = (function() {
         }
       }
       retval.states = valid_states;
-      retval.data_fields = processor.data_fields;
+      retval.data_fields = processor.data_fields || {};
     }
     if (all_errors.length > 0) {
       retval.errors = all_errors;
