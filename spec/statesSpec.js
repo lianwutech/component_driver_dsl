@@ -24,7 +24,7 @@ describe("states", function() {
     expect(driver).not.toHaveState('open');
     expect(driver).toHaveError('Please call state(name, desc, permitted_actions)');
   });
-  describe("permit()", function() {
+  describe("state actions", function() {
     it("should not add nonexist actions", function() {
       state = driver.data_processor(function(device_id, device_type, timestamp, raw_data){}).state('open', '打开状态', ['wtf?']);
       expect(driver).not.toHaveState('open');
