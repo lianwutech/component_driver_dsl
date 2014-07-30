@@ -113,6 +113,7 @@ Action = (function() {
       }
     }
     retval = {
+      desc: this.desc,
       parameters: this.parameters
     };
     if (all_errors.length > 0) {

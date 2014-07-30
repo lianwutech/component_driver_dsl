@@ -68,7 +68,7 @@ class Action
     for name, index in @parameter_names
       if !@parameters[name]?
         all_errors.push "Parameter '#{name}' not defined for action '#{@name}'"
-    retval = { parameters: @parameters }
+    retval = { desc: @desc, parameters: @parameters }
     if all_errors.length > 0 then retval.errors = all_errors
 
     return retval

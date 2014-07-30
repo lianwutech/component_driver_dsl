@@ -10,6 +10,8 @@ describe("actions", function() {
     expect(driver).not.toHaveAction('open');
     driver.action('open', '打开阀门', function() { });
     expect(driver).toHaveAction('open');
+    var result = driver.validate();
+    expect(result.actions).toEqual({open:{desc:'打开阀门', parameters:{}}});
   });
   it("should not add action if lack of name", function() {
     driver.action(' ', 'desc', function() { });
