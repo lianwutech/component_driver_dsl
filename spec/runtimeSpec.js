@@ -34,6 +34,10 @@ describe("runtime behaviour", function() {
     var result = driver.process_data("DEVICE_ID", 0, "2013-33-33", "CCFF");
     expect(global.log).toHaveBeenCalledWith(40, 'Error in process_data(DEVICE_ID, 0, 2013-33-33, CCFF): Error - fake error');
   });
+  it("component should not be passive by default", function() {
+    var result = driver.validate();
+    expect(result.passive).toBe(false);
+  });
   it("calling data_fetcher() should make component passive", function() {
     driver.data_fetcher(function() {
       return '48ED';

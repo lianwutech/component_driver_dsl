@@ -249,6 +249,7 @@ class ComponentDriverDSL
     retval = {
       fields: @fields
       actions: valid_actions
+      passive: false
     }
 
     if @fetcher? then retval.passive = true
