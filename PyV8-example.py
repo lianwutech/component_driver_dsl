@@ -15,8 +15,8 @@ ctxt.eval(driver)
 example = open('spec/example.js', 'r').read()
 ctxt.eval(example)
 
-ctxt.eval("var meta_data = JSON.stringify(driver.validate())")
-meta_data = json.loads(ctxt.locals.meta_data)
+ctxt.eval("var meta_data = driver.validate()")
+meta_data = PyV8.convert(ctxt.locals.meta_data)
 print "meta data:"
 print meta_data["fields"]
 print "errors:"
@@ -33,15 +33,19 @@ devices_dict = {'343dsadfas': {'device_type': 'adsfas'}}
 ctxt.eval("var devices_dict = %s" % json.dumps(devices_dict))
 ctxt.eval("log(10, JSON.stringify(devices_dict));")
 
+print "fetch_data:"
+ctxt.eval("var result = driver.fetch_data();")
+print PyV8.convert(ctxt.locals.result)
+
 print "process_data:"
-result = ctxt.eval("var result = JSON.stringify(driver.process_data('8D4B6F_1', 1101, '2014-07-25 09:41:43', '00'));")
-print json.loads(ctxt.locals.result)
+ctxt.eval("var result = driver.process_data('8D4B6F_1', 1101, '2014-07-25 09:41:43', '00');")
+print PyV8.convert(ctxt.locals.result)
 
 print "translate_action:"
 result = ctxt.eval("driver.translate_action('move')")
-print result
+print PyV8.convert(result)
 
 print "log:"
 ctxt.eval("driver.action('test', 'test', function() { debug('debug msg') });")
-ctxt.eval("JSON.stringify(driver.validate())")
+ctxt.eval("driver.validate()")
 result = ctxt.eval("driver.translate_action('test')")
