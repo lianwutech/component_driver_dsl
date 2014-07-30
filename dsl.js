@@ -358,7 +358,8 @@ ComponentDriverDSL = (function() {
     }
     retval = {
       fields: this.fields,
-      actions: valid_actions
+      actions: valid_actions,
+      passive: false
     };
     if (this.fetcher != null) {
       retval.passive = true;

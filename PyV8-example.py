@@ -27,6 +27,8 @@ print "states:"
 print meta_data["states"]
 print "data fields:"
 print meta_data["data_fields"]
+print "passive?:"
+print meta_data["passive"]
 
 print "init:"
 devices_dict = {'343dsadfas': {'device_type': 'adsfas'}}
