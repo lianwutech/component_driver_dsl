@@ -2,7 +2,8 @@ driver.name('iRobot型人形机器人')
 .version('0.0.1')
 .desc('初代版本')
 .author('david')
-.email('david@lianwutech.com');
+.email('david@lianwutech.com')
+.protocol('standard');
 
 driver.action('move', '移动', function(direction) {
   return "MOVE";

@@ -147,6 +147,7 @@ class ComponentDriverDSL
     'desc'
     'author'
     'email'
+    'protocol'
   ]
 
   constructor: ->
@@ -197,6 +198,11 @@ class ComponentDriverDSL
       @fields.email = str
     else
       this.addError 'Driver email is malformed'
+    this
+
+  protocol: (str) ->
+    @field_given.protocol = true
+    @fields.protocol = str
     this
 
   action: (name, desc, fn) ->

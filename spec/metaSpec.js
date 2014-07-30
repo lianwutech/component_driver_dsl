@@ -51,16 +51,25 @@ describe("meta data", function() {
     expect(driver).not.toHaveField('email');
     expect(driver).toHaveError('Driver email is malformed');
   });
+  it("should check protocol", function() {
+    var errMsg ='Driver protocol() is required';
+    expect(driver).toHaveError(errMsg);
+    driver.protocol("modbus");
+    expect(driver).toHaveField('protocol');
+    expect(driver).not.toHaveError(errMsg);
+  });
   it("meta data setter can be chained", function() {
     driver.name('DJ390型电磁阀')
     .version('0.0.1')
     .desc('宇宙第一好的驱动，但是有8个BUG')
     .author("邓大卫")
-    .email("david@lianwutech.com");
+    .email("david@lianwutech.com")
+    .protocol("modbus");
     expect(driver).toHaveField('name');
     expect(driver).toHaveField('version');
     expect(driver).toHaveField('desc');
     expect(driver).toHaveField('author');
     expect(driver).toHaveField('email');
+    expect(driver).toHaveField('protocol');
   });
 });

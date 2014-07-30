@@ -227,7 +227,7 @@ RawDataProcessor = (function() {
 ComponentDriverDSL = (function() {
   var required_fields, splat;
 
-  required_fields = ['name', 'version', 'desc', 'author', 'email'];
+  required_fields = ['name', 'version', 'desc', 'author', 'email', 'protocol'];
 
   function ComponentDriverDSL() {
     var field, _i, _len;
@@ -285,6 +285,12 @@ ComponentDriverDSL = (function() {
     } else {
       this.addError('Driver email is malformed');
     }
+    return this;
+  };
+
+  ComponentDriverDSL.prototype.protocol = function(str) {
+    this.field_given.protocol = true;
+    this.fields.protocol = str;
     return this;
   };
 
