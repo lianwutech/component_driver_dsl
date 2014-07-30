@@ -225,7 +225,7 @@ RawDataProcessor = (function() {
 })();
 
 ComponentDriverDSL = (function() {
-  var required_fields;
+  var required_fields, splat;
 
   required_fields = ['name', 'version', 'desc', 'author', 'email'];
 
@@ -296,50 +296,6 @@ ComponentDriverDSL = (function() {
     }
   };
 
-  ComponentDriverDSL.prototype.translate_action = function(name, parameters) {
-    var action, device_id, e, item, param, param_name, real_params, result, result_array, value, _i, _len;
-    action = this.actions[name];
-    if (action == null) {
-      return error("Action " + name + " doesn't exist");
-    } else {
-      real_params = [];
-      for (param_name in parameters) {
-        value = parameters[param_name];
-        param = action.parameters[param_name];
-        if (param != null) {
-          real_params[param.sequence] = value;
-        }
-      }
-      try {
-        result = action.fn.apply(null, real_params);
-      } catch (_error) {
-        e = _error;
-        error(e.name + ': ' + e.message);
-      }
-      result_array = [];
-      if (typeIsArray(result)) {
-        for (_i = 0, _len = result.length; _i < _len; _i++) {
-          item = result[_i];
-          if (__indexOf.call(item.keys(), 'device_id') < 0 || __indexOf.call(item.keys(), 'ctrl_msg') < 0) {
-            error("action '" + name + "' should return array of {device_id, ctrl_msg}");
-          } else {
-            result_array.push(item);
-          }
-        }
-      } else if (typeof result === 'string') {
-        for (device_id in devices_dict) {
-          result_array.push({
-            device_id: device_id,
-            ctrl_msg: result
-          });
-        }
-      } else {
-        error("action '" + name + "' should return array or string");
-      }
-      return result_array;
-    }
-  };
-
   ComponentDriverDSL.prototype.data_processor = function(fn) {
     var arrayEquals, params, required_params;
     arrayEquals = function(s, o) {
@@ -364,6 +320,10 @@ ComponentDriverDSL = (function() {
     } else {
       return error("data_processor should have exactly 4 parameters: " + required_params);
     }
+  };
+
+  ComponentDriverDSL.prototype.data_fetcher = function(fetcher) {
+    this.fetcher = fetcher;
   };
 
   ComponentDriverDSL.prototype.validate = function() {
@@ -393,6 +353,9 @@ ComponentDriverDSL = (function() {
       fields: this.fields,
       actions: valid_actions
     };
+    if (this.fetcher != null) {
+      retval.passive = true;
+    }
     if (this.raw_data_processor == null) {
       all_errors.push("data_processor() not provided");
     } else {
@@ -447,7 +410,67 @@ ComponentDriverDSL = (function() {
       return this.raw_data_processor.process(device_id, device_type, timestamp, raw_data);
     } catch (_error) {
       e = _error;
-      return error(e.name + ': ' + e.message);
+      return error("Error in process_data(" + device_id + ", " + device_type + ", " + timestamp + ", " + raw_data + "): " + e.name + " - " + e.message);
+    }
+  };
+
+  splat = function(result, subject) {
+    var device_id, item, result_array, _i, _len;
+    result_array = [];
+    if (typeIsArray(result)) {
+      for (_i = 0, _len = result.length; _i < _len; _i++) {
+        item = result[_i];
+        if (__indexOf.call(item.keys(), 'device_id') < 0 || __indexOf.call(item.keys(), 'ctrl_msg') < 0) {
+          error("" + subject + " should return array of {device_id, ctrl_msg}");
+        } else {
+          result_array.push(item);
+        }
+      }
+    } else if (typeof result === 'string') {
+      for (device_id in devices_dict) {
+        result_array.push({
+          device_id: device_id,
+          ctrl_msg: result
+        });
+      }
+    } else {
+      error("" + subject + " should return array or string");
+    }
+    return result_array;
+  };
+
+  ComponentDriverDSL.prototype.translate_action = function(name, parameters) {
+    var action, e, param, param_name, real_params, result, value;
+    action = this.actions[name];
+    if (action == null) {
+      return error("Action " + name + " doesn't exist");
+    } else {
+      real_params = [];
+      for (param_name in parameters) {
+        value = parameters[param_name];
+        param = action.parameters[param_name];
+        if (param != null) {
+          real_params[param.sequence] = value;
+        }
+      }
+      try {
+        result = action.fn.apply(null, real_params);
+        return splat(result, "Action " + name);
+      } catch (_error) {
+        e = _error;
+        return error("Error in translate_action(\"" + name + "\"): " + e.name + " - " + e.message);
+      }
+    }
+  };
+
+  ComponentDriverDSL.prototype.fetch_data = function() {
+    var e, result;
+    try {
+      result = this.fetcher();
+      return splat(result, "data_fetcher()");
+    } catch (_error) {
+      e = _error;
+      return error("Error in fetch_data(): " + e.name + " - " + e.message);
     }
   };
 

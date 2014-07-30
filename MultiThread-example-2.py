@@ -68,9 +68,9 @@ class ComponentDriver (threading.Thread):
 
                 print "%s wait for data..........." % self.name
                 time.sleep(1)
-                print "**************%s PyV8 Ends**************" % self.name
 
             self.ctxt.leave()
+            print "**************%s PyV8 Ends**************" % self.name
 
 thread1 = ComponentDriver(1, "Thread-1", 1)
 thread1.start()

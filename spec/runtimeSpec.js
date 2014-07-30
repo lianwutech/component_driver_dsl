@@ -32,7 +32,28 @@ describe("runtime behaviour", function() {
       throw new Error("fake error");
     });
     var result = driver.process_data("DEVICE_ID", 0, "2013-33-33", "CCFF");
-    expect(global.log).toHaveBeenCalledWith(40, 'Error: fake error');
+    expect(global.log).toHaveBeenCalledWith(40, 'Error in process_data(DEVICE_ID, 0, 2013-33-33, CCFF): Error - fake error');
+  });
+  it("calling data_fetcher() should make component passive", function() {
+    driver.data_fetcher(function() {
+      return '48ED';
+    });
+    var result = driver.validate();
+    expect(result.passive).toBe(true);
+  });
+  it("fetch_data() should retrieve data", function() {
+    driver.data_fetcher(function() {
+      return '48ED';
+    });
+    var result = driver.fetch_data();
+    expect(result).toEqual([ { device_id : '3FDASFE', ctrl_msg : '48ED' }, { device_id : '1DDF34F', ctrl_msg : '48ED' } ]);
+  });
+  it("should catch js errors in data fetcher", function() {
+    driver.data_fetcher(function() {
+      throw new Error("fake error");
+    });
+    var result = driver.fetch_data();
+    expect(global.log).toHaveBeenCalledWith(40, 'Error in fetch_data(): Error - fake error');
   });
   it("should translate action", function() {
     driver.action('move', '移动', function() {
@@ -59,7 +80,7 @@ describe("runtime behaviour", function() {
       throw new Error("fake error");
     });
     var result = driver.translate_action("move");
-    expect(global.log).toHaveBeenCalledWith(40, 'Error: fake error');
+    expect(global.log).toHaveBeenCalledWith(40, 'Error in translate_action("move"): Error - fake error');
   });
 });
 

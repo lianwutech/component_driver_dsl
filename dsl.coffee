@@ -207,36 +207,6 @@ class ComponentDriverDSL
     else
       @actions[name] = new Action(name, desc, fn)
 
-  translate_action: (name, parameters) ->
-    action = @actions[name]
-    if !action?
-      error "Action #{name} doesn't exist"
-    else
-      real_params = []
-      for param_name, value of parameters
-        param = action.parameters[param_name]
-        if param? then real_params[param.sequence] = value
-      try
-        result = action.fn.apply(null, real_params)
-      catch e
-        error e.name + ': ' + e.message
-
-      result_array = []
-      if typeIsArray(result)
-        for item in result
-          if 'device_id' not in item.keys() ||
-             'ctrl_msg' not in item.keys()
-            error "action '#{name}' should return array of {device_id, ctrl_msg}"
-          else
-            result_array.push(item)
-      else if typeof(result) == 'string'
-        for device_id of devices_dict
-          result_array.push({device_id: device_id, ctrl_msg: result})
-      else
-        error "action '#{name}' should return array or string"
-
-      result_array
-
   data_processor: (fn) ->
 
     arrayEquals = (s, o) ->
@@ -252,6 +222,8 @@ class ComponentDriverDSL
       @raw_data_processor = new RawDataProcessor(fn)
     else
       error "data_processor should have exactly 4 parameters: #{required_params}"
+
+  data_fetcher: (@fetcher) ->
 
   validate: ->
     all_errors = [].concat @errors
@@ -273,6 +245,7 @@ class ComponentDriverDSL
       actions: valid_actions
     }
 
+    if @fetcher? then retval.passive = true
     if !@raw_data_processor?
       all_errors.push "data_processor() not provided"
     else
@@ -307,7 +280,45 @@ class ComponentDriverDSL
     try
       @raw_data_processor.process(device_id, device_type, timestamp, raw_data)
     catch e
-      error e.name + ': ' + e.message
+      error "Error in process_data(#{device_id}, #{device_type}, #{timestamp}, #{raw_data}): #{e.name} - #{e.message}"
+
+  splat = (result, subject) ->
+      result_array = []
+      if typeIsArray(result)
+        for item in result
+          if 'device_id' not in item.keys() ||
+             'ctrl_msg' not in item.keys()
+            error "#{subject} should return array of {device_id, ctrl_msg}"
+          else
+            result_array.push(item)
+      else if typeof(result) == 'string'
+        for device_id of devices_dict
+          result_array.push({device_id: device_id, ctrl_msg: result})
+      else
+        error "#{subject} should return array or string"
+      result_array
+
+  translate_action: (name, parameters) ->
+    action = @actions[name]
+    if !action?
+      error "Action #{name} doesn't exist"
+    else
+      real_params = []
+      for param_name, value of parameters
+        param = action.parameters[param_name]
+        if param? then real_params[param.sequence] = value
+      try
+        result = action.fn.apply(null, real_params)
+        splat(result, "Action #{name}")
+      catch e
+        error "Error in translate_action(\"#{name}\"): #{e.name} - #{e.message}"
+
+  fetch_data: () ->
+      try
+        result = @fetcher()
+        splat(result, "data_fetcher()")
+      catch e
+        error "Error in fetch_data(): #{e.name} - #{e.message}"
 
 if module?
   module.exports = ComponentDriverDSL;
