@@ -298,11 +298,11 @@ class ComponentDriverDSL
             error "#{subject} should return array of {device_id, ctrl_msg}"
           else
             result_array.push(item)
-      else if typeof(result) == 'string'
+      else if result?
         for device_id of devices_dict
           result_array.push({device_id: device_id, ctrl_msg: result})
       else
-        error "#{subject} should return array or string"
+        error "#{subject} should have return value"
       result_array
 
   translate_action: (name, parameters) ->

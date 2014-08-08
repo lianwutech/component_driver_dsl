@@ -434,7 +434,7 @@ ComponentDriverDSL = (function() {
           result_array.push(item);
         }
       }
-    } else if (typeof result === 'string') {
+    } else if (result != null) {
       for (device_id in devices_dict) {
         result_array.push({
           device_id: device_id,
@@ -442,7 +442,7 @@ ComponentDriverDSL = (function() {
         });
       }
     } else {
-      error("" + subject + " should return array or string");
+      error("" + subject + " should have return value");
     }
     return result_array;
   };
