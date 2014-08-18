@@ -50,7 +50,7 @@ describe("runtime behaviour", function() {
       return '48ED';
     });
     var result = driver.fetch_data();
-    expect(result).toEqual([ { device_id : '3FDASFE', ctrl_msg : '48ED' }, { device_id : '1DDF34F', ctrl_msg : '48ED' } ]);
+    expect(result).toEqual([ { device_id : '3FDASFE', command : '48ED' }, { device_id : '1DDF34F', command : '48ED' } ]);
   });
   it("should catch js errors in data fetcher", function() {
     driver.data_fetcher(function() {
@@ -64,7 +64,7 @@ describe("runtime behaviour", function() {
       return '13FE';
     });
     var result = driver.translate_action('move');
-    expect(result).toEqual([ { device_id : '3FDASFE', ctrl_msg : '13FE' }, { device_id : '1DDF34F', ctrl_msg : '13FE' } ]);
+    expect(result).toEqual([ { device_id : '3FDASFE', command : '13FE' }, { device_id : '1DDF34F', command : '13FE' } ]);
   });
   it("should not translate nonexist action", function() {
     var result = driver.translate_action('move');
@@ -77,7 +77,7 @@ describe("runtime behaviour", function() {
     .parameter('min', 'param description', 'number', {min: 1, max: 100, step: 1})
     .parameter('max', 'param description', 'number', {min: 1, max: 100, step: 1});
     var result = driver.translate_action('set_threshold', {max: 90, min: 10});
-    expect(result).toEqual([ { device_id : '3FDASFE', ctrl_msg : 'a5a' }, { device_id : '1DDF34F', ctrl_msg : 'a5a' } ]);
+    expect(result).toEqual([ { device_id : '3FDASFE', command : 'a5a' }, { device_id : '1DDF34F', command : 'a5a' } ]);
   });
   it("should catch js errors when translate action", function() {
     driver.action('move', '移动', function() {

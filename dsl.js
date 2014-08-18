@@ -428,8 +428,8 @@ ComponentDriverDSL = (function() {
     if (typeIsArray(result)) {
       for (_i = 0, _len = result.length; _i < _len; _i++) {
         item = result[_i];
-        if (__indexOf.call(item.keys(), 'device_id') < 0 || __indexOf.call(item.keys(), 'ctrl_msg') < 0) {
-          error("" + subject + " should return array of {device_id, ctrl_msg}");
+        if (__indexOf.call(item.keys(), 'device_id') < 0 || __indexOf.call(item.keys(), 'command') < 0) {
+          error("" + subject + " should return array of {device_id, command}");
         } else {
           result_array.push(item);
         }
@@ -438,7 +438,7 @@ ComponentDriverDSL = (function() {
       for (device_id in devices_dict) {
         result_array.push({
           device_id: device_id,
-          ctrl_msg: result
+          command: result
         });
       }
     } else {

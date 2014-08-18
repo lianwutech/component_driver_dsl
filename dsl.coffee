@@ -294,13 +294,13 @@ class ComponentDriverDSL
       if typeIsArray(result)
         for item in result
           if 'device_id' not in item.keys() ||
-             'ctrl_msg' not in item.keys()
-            error "#{subject} should return array of {device_id, ctrl_msg}"
+             'command' not in item.keys()
+            error "#{subject} should return array of {device_id, command}"
           else
             result_array.push(item)
       else if result?
         for device_id of devices_dict
-          result_array.push({device_id: device_id, ctrl_msg: result})
+          result_array.push({device_id: device_id, command: result})
       else
         error "#{subject} should have return value"
       result_array
