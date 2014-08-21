@@ -32,6 +32,9 @@ driver.action('set_speed_range', '设置移动速度的范围', function(min, ma
 
 driver.data_fetcher(function() { return '49ED'; });
 driver.data_processor(function(device_id, device_type, timestamp, raw_data) {
+  if (typeof devices_dict[device_id] === Undefined) {
+    error("no device_id " + device_id + " found");
+  }
   return {
     data: { direction: '东', speed: 12.5, raw: raw_data },
     state: 'moving'

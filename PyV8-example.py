@@ -51,3 +51,5 @@ print "log:"
 ctxt.eval("driver.action('test', 'test', function() { debug('debug msg') });")
 ctxt.eval("driver.validate()")
 result = ctxt.eval("driver.translate_action('test')")
+
+ctxt.leave()
