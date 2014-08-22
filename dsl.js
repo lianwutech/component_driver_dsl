@@ -418,7 +418,8 @@ ComponentDriverDSL = (function() {
       return this.raw_data_processor.process(device_id, device_type, timestamp, raw_data);
     } catch (_error) {
       e = _error;
-      return error("Error in process_data(" + device_id + ", " + device_type + ", " + timestamp + ", " + raw_data + "): " + e.name + " - " + e.message);
+      error("Error in process_data(" + device_id + ", " + device_type + ", " + timestamp + ", " + raw_data + "): " + e.name + " - " + e.message);
+      return error(e.stack);
     }
   };
 
@@ -466,7 +467,8 @@ ComponentDriverDSL = (function() {
         return splat(result, "Action " + name);
       } catch (_error) {
         e = _error;
-        return error("Error in translate_action(\"" + name + "\"): " + e.name + " - " + e.message);
+        error("Error in translate_action(\"" + name + "\"): " + e.name + " - " + e.message);
+        return error(e.stack);
       }
     }
   };
@@ -478,7 +480,8 @@ ComponentDriverDSL = (function() {
       return splat(result, "data_fetcher()");
     } catch (_error) {
       e = _error;
-      return error("Error in fetch_data(): " + e.name + " - " + e.message);
+      error("Error in fetch_data(): " + e.name + " - " + e.message);
+      return error(e.stack);
     }
   };
 
