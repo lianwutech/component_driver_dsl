@@ -22,6 +22,11 @@ getParamNames = (func) ->
 typeIsArray = Array.isArray ||
 (value) -> return {}.toString.call( value ) is '[object Array]'
 
+logStack = (stack) ->
+  stack.split('\n').reverse().forEach((line) ->
+    error line
+  )
+
 class Action
   constructor: (@name, @desc, @fn)->
     @errors = []
@@ -288,7 +293,7 @@ class ComponentDriverDSL
       @raw_data_processor.process(device_id, device_type, timestamp, raw_data)
     catch e
       error "Error in process_data(#{device_id}, #{device_type}, #{timestamp}, #{raw_data}): #{e.name} - #{e.message}"
-      error e.stack
+      logStack e.stack
 
   splat = (result, subject) ->
       result_array = []
@@ -320,7 +325,7 @@ class ComponentDriverDSL
         splat(result, "Action #{name}")
       catch e
         error "Error in translate_action(\"#{name}\"): #{e.name} - #{e.message}"
-        error e.stack
+        logStack e.stack
 
   fetch_data: () ->
       try
@@ -328,7 +333,7 @@ class ComponentDriverDSL
         splat(result, "data_fetcher()")
       catch e
         error "Error in fetch_data(): #{e.name} - #{e.message}"
-        error e.stack
+        logStack e.stack
 
 if module?
   module.exports = ComponentDriverDSL;

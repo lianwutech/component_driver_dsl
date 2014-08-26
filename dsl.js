@@ -1,4 +1,4 @@
-var ARGUMENT_NAMES, Action, CRITICAL, ComponentDriverDSL, DEBUG, ERROR, INFO, RawDataProcessor, STRIP_COMMENTS, WARNING, critical, debug, driver, error, getParamNames, info, typeIsArray, warning,
+var ARGUMENT_NAMES, Action, CRITICAL, ComponentDriverDSL, DEBUG, ERROR, INFO, RawDataProcessor, STRIP_COMMENTS, WARNING, critical, debug, driver, error, getParamNames, info, logStack, typeIsArray, warning,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
   __hasProp = {}.hasOwnProperty;
 
@@ -48,6 +48,12 @@ getParamNames = function(func) {
 
 typeIsArray = Array.isArray || function(value) {
   return {}.toString.call(value) === '[object Array]';
+};
+
+logStack = function(stack) {
+  return stack.split('\n').reverse().forEach(function(line) {
+    return error(line);
+  });
 };
 
 Action = (function() {
@@ -419,7 +425,7 @@ ComponentDriverDSL = (function() {
     } catch (_error) {
       e = _error;
       error("Error in process_data(" + device_id + ", " + device_type + ", " + timestamp + ", " + raw_data + "): " + e.name + " - " + e.message);
-      return error(e.stack);
+      return logStack(e.stack);
     }
   };
 
@@ -468,7 +474,7 @@ ComponentDriverDSL = (function() {
       } catch (_error) {
         e = _error;
         error("Error in translate_action(\"" + name + "\"): " + e.name + " - " + e.message);
-        return error(e.stack);
+        return logStack(e.stack);
       }
     }
   };
@@ -481,7 +487,7 @@ ComponentDriverDSL = (function() {
     } catch (_error) {
       e = _error;
       error("Error in fetch_data(): " + e.name + " - " + e.message);
-      return error(e.stack);
+      return logStack(e.stack);
     }
   };
 
