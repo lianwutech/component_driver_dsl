@@ -325,7 +325,7 @@ ComponentDriverDSL = (function() {
     if (arrayEquals(params, required_params)) {
       return this.raw_data_processor = new RawDataProcessor(fn);
     } else {
-      return error("data_processor should have exactly 4 parameters: " + required_params);
+      return this.addError("data_processor should have exactly 4 parameters: " + required_params);
     }
   };
 

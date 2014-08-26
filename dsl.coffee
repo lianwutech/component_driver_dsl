@@ -227,7 +227,7 @@ class ComponentDriverDSL
     if (arrayEquals(params, required_params))
       @raw_data_processor = new RawDataProcessor(fn)
     else
-      error "data_processor should have exactly 4 parameters: #{required_params}"
+      this.addError "data_processor should have exactly 4 parameters: #{required_params}"
 
   data_fetcher: (@fetcher) ->
 
