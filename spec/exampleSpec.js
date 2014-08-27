@@ -15,7 +15,7 @@ describe("Driver actions", function() {
   });
   it("should load full example driver", function() {
     driver = new DSL();
-    require('./example.js');
+    require('../example.js');
     expect(driver).not.toHaveError();
   });
 });
