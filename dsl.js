@@ -171,7 +171,7 @@ RawDataProcessor = (function() {
         var _ref;
         switch (item.type) {
           case "number":
-            if (typeof item.unit !== 'string' || item.unit.trim().length === 0) {
+            if (typeof item.unit !== 'string') {
               _this.errors.push("data type 'number' should have unit");
               return false;
             } else {

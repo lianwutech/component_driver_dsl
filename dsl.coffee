@@ -106,7 +106,7 @@ class RawDataProcessor
     checkType = (item)=>
         switch item.type
           when "number"
-            if typeof(item.unit) != 'string' || item.unit.trim().length == 0
+            if typeof(item.unit) != 'string'
               @errors.push "data type 'number' should have unit"
               false
             else
