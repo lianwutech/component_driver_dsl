@@ -1,4 +1,4 @@
-var ARGUMENT_NAMES, Action, CRITICAL, ComponentDriverDSL, DEBUG, ERROR, INFO, RawDataProcessor, STRIP_COMMENTS, WARNING, critical, debug, driver, error, getParamNames, info, logStack, typeIsArray, warning,
+var ARGUMENT_NAMES, Action, ActionResultProcessor, CRITICAL, ComponentDriverDSL, DEBUG, ERROR, INFO, RawDataProcessor, STRIP_COMMENTS, WARNING, arrayEquals, critical, debug, driver, error, getParamNames, info, logStack, typeIsArray, warning,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
   __hasProp = {}.hasOwnProperty;
 
@@ -48,6 +48,22 @@ getParamNames = function(func) {
 
 typeIsArray = Array.isArray || function(value) {
   return {}.toString.call(value) === '[object Array]';
+};
+
+arrayEquals = function(s, o) {
+  var i, _i, _ref;
+  if (s === o) {
+    return true;
+  }
+  if (s.length !== o.length) {
+    return false;
+  }
+  for (i = _i = 0, _ref = s.length; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+    if (s[i] !== o[i]) {
+      return false;
+    }
+  }
+  return true;
 };
 
 logStack = function(stack) {
@@ -129,6 +145,19 @@ Action = (function() {
   };
 
   return Action;
+
+})();
+
+ActionResultProcessor = (function() {
+  function ActionResultProcessor(fn) {
+    this.fn = fn;
+  }
+
+  ActionResultProcessor.prototype.process = function(command, result) {
+    return this.fn(command, result);
+  };
+
+  return ActionResultProcessor;
 
 })();
 
@@ -315,23 +344,19 @@ ComponentDriverDSL = (function() {
     }
   };
 
+  ComponentDriverDSL.prototype.action_result_processor = function(fn) {
+    var params, required_params;
+    required_params = ['command', 'result'];
+    params = getParamNames(fn);
+    if (arrayEquals(params, required_params)) {
+      return this.raw_action_result_processor = new ActionResultProcessor(fn);
+    } else {
+      return this.addError("action_result_processor should have exactly 2 parameters: " + required_params);
+    }
+  };
+
   ComponentDriverDSL.prototype.data_processor = function(fn) {
-    var arrayEquals, params, required_params;
-    arrayEquals = function(s, o) {
-      var i, _i, _ref;
-      if (s === o) {
-        return true;
-      }
-      if (s.length !== o.length) {
-        return false;
-      }
-      for (i = _i = 0, _ref = s.length; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-        if (s[i] !== o[i]) {
-          return false;
-        }
-      }
-      return true;
-    };
+    var params, required_params;
     required_params = ['device_id', 'device_type', 'timestamp', 'raw_data'];
     params = getParamNames(fn);
     if (arrayEquals(params, required_params)) {
@@ -482,6 +507,23 @@ ComponentDriverDSL = (function() {
         error("Error in translate_action(\"" + name + "\"): " + e.name + " - " + e.message);
         return logStack(e.stack);
       }
+    }
+  };
+
+  ComponentDriverDSL.prototype.process_action_result = function(command, result) {
+    var e;
+    if (this.raw_action_result_processor == null) {
+      return {
+        "result": "unprocessed",
+        "result_desc": ""
+      };
+    }
+    try {
+      return this.raw_action_result_processor.process(command, result);
+    } catch (_error) {
+      e = _error;
+      error("Error in process_action_result(" + command + ", " + result + ": " + e.name + " - " + e.message);
+      return logStack(e.stack);
     }
   };
 

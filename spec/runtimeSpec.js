@@ -86,5 +86,29 @@ describe("runtime behaviour", function() {
     var result = driver.translate_action("move");
     expect(global.log).toHaveBeenCalledWith(40, 'Error in translate_action("move"): Error - fake error');
   });
+  it("should process action result", function() {
+    driver.action('set_threshold', '设置上下限', function(min, max) {
+      return (min*0x100 + max).toString(16);
+    })
+    .parameter('min', 'param description', 'number', {min: 1, max: 100, step: 1})
+    .parameter('max', 'param description', 'number', {min: 1, max: 100, step: 1});
+    driver.action_result_processor(function(command, result) {
+      return {
+        result: "success",
+        result_desc: ""
+      };
+    });
+    var result = driver.translate_action('set_threshold', {max: 90, min: 10});
+    expect(result).toEqual([ { device_id : '3FDASFE', command : 'a5a' }, { device_id : '1DDF34F', command : 'a5a' } ]);
+    var result2 = driver.process_action_result({}, "SDFAF");
+    expect(result2).toEqual( { result: "success", result_desc: "" });
+  });
+  it("should catch js errors when process action result", function() {
+    driver.action_result_processor(function(command, result) {
+      throw new Error("fake error");
+    });
+    driver.process_action_result({"command_id" : 1}, "SDFAF");
+    expect(global.log).toHaveBeenCalledWith(40, 'Error: fake error');
+  });
 });
 

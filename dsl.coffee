@@ -22,6 +22,13 @@ getParamNames = (func) ->
 typeIsArray = Array.isArray ||
 (value) -> return {}.toString.call( value ) is '[object Array]'
 
+arrayEquals = (s, o) ->
+  return true if s is o
+  return false if s.length isnt o.length
+  for i in [0..s.length]
+    return false if s[i] isnt o[i]
+  true
+
 logStack = (stack) ->
   stack.split('\n').reverse().forEach((line) ->
     error line
@@ -77,6 +84,12 @@ class Action
     if all_errors.length > 0 then retval.errors = all_errors
 
     return retval
+
+class ActionResultProcessor
+  constructor: (@fn)->
+
+  process: (command, result) ->
+    @fn(command, result)
 
 class RawDataProcessor
   constructor: (@fn)->
@@ -221,15 +234,15 @@ class ComponentDriverDSL
     else
       @actions[name] = new Action(name, desc, fn)
 
+  action_result_processor: (fn) ->
+    required_params = ['command', 'result']
+    params = getParamNames(fn)
+    if (arrayEquals(params, required_params))
+      @raw_action_result_processor = new ActionResultProcessor(fn)
+    else
+      this.addError "action_result_processor should have exactly 2 parameters: #{required_params}"
+
   data_processor: (fn) ->
-
-    arrayEquals = (s, o) ->
-      return true if s is o
-      return false if s.length isnt o.length
-      for i in [0..s.length]
-        return false if s[i] isnt o[i]
-      true
-
     required_params = ['device_id', 'device_type', 'timestamp', 'raw_data']
     params = getParamNames(fn)
     if (arrayEquals(params, required_params))
@@ -329,6 +342,16 @@ class ComponentDriverDSL
       catch e
         error "Error in translate_action(\"#{name}\"): #{e.name} - #{e.message}"
         logStack e.stack
+
+  process_action_result: (command, result) ->
+    if !@raw_action_result_processor?
+      return { "result": "unprocessed", "result_desc": "" }
+
+    try
+      return @raw_action_result_processor.process(command, result)
+    catch e
+      error "Error in process_action_result(#{command}, #{result}: #{e.name} - #{e.message}"
+      logStack e.stack
 
   fetch_data: () ->
       try
