@@ -18,7 +18,7 @@ describe("data processor", function() {
   it("should provide return data fields", function() {
     var processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
     processor.data({
-      "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" },
+      "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" }
     });
     expect(processor).not.toHaveError();
     expect(processor.validate().will_return_data).toBe(true);
@@ -33,7 +33,7 @@ describe("data processor", function() {
   it("or both", function() {
     var processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
     processor.data({
-      "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" },
+      "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" }
     }).state('open', '打开状态', ['close']);
     expect(processor).not.toHaveError();
     expect(processor).toHaveDataField("speed");
@@ -47,8 +47,9 @@ describe("data processor", function() {
     it("should allow number, string and boolean type", function() {
       processor.data({
         "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" },
-        "direction": { "name": "方向", "type": "string" },
-        "has_obstacle": { "name": "障碍物", "type": "boolean", "true": "有", "false": "没有"}
+        "direction": { "name": "方向", "type": "string" }
+      }).data(
+        {"has_obstacle": { "name": "障碍物", "type": "boolean", "true": "有", "false": "没有"}
       });
       expect(processor).toHaveDataField("speed");
       expect(processor).toHaveDataField("direction");

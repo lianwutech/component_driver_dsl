@@ -136,6 +136,7 @@ RawDataProcessor = (function() {
   function RawDataProcessor(fn) {
     this.fn = fn;
     this.states = {};
+    this.data_fields = {};
     this.errors = [];
   }
 
@@ -144,7 +145,12 @@ RawDataProcessor = (function() {
   };
 
   RawDataProcessor.prototype.data = function(data_fields) {
-    this.data_fields = data_fields;
+    var item, key;
+    for (key in data_fields) {
+      if (!__hasProp.call(data_fields, key)) continue;
+      item = data_fields[key];
+      this.data_fields[key] = item;
+    }
     this.will_return_data = true;
     return this;
   };

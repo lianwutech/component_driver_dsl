@@ -81,12 +81,15 @@ class Action
 class RawDataProcessor
   constructor: (@fn)->
     @states = {}
+    @data_fields = {}
     @errors = []
 
   process: (device_id, device_type, timestamp, raw_data) ->
     @fn(device_id, device_type, timestamp, raw_data)
 
-  data: (@data_fields) ->
+  data: (data_fields) ->
+    for own key, item of data_fields
+      @data_fields[key] = item
     @will_return_data = true
     this
 

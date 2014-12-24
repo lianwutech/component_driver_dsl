@@ -21,9 +21,9 @@ gulp.task('test', ['coffee'], function() {
   .pipe(jasmine({verbose: false, includeStackTrace: true}));
 });
 
-/*gulp.task('watch', function() {
+gulp.task('watch', function() {
   watch(paths.coffee, ['test']);
   watch(paths.specs, ['test']);
-});*/
+});
 
 gulp.task('default', ['test', 'watch']);
