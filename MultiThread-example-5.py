@@ -33,7 +33,7 @@ def runner(name):
             print '\n***************' + name
             print "process_data returns:"
             result = ctxt.eval(
-                "var result = driver.process_data('8D4B6F_1', 1101, '2014-07-25 09:41:43', '00');",
+                "var result = driver.process_data('8D4B6F_1', 1101, 1, '2014-07-25 09:41:43', '00');",
                 'process_data')
             print PyV8.convert(ctxt.locals.result)
 

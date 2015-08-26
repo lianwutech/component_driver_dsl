@@ -8,15 +8,15 @@ describe("data processor", function() {
   });
   it("should check if data_processor() called", function() {
     expect(driver).toHaveError("data_processor() not provided");
-    driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
+    driver.data_processor(function(device_id, device_type, component_id, timestamp, raw_data) {});
     expect(driver).not.toHaveError("data_processor() not provided");
   });
   it("should data() or state(), or both", function() {
-    var processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
+    var processor = driver.data_processor(function(device_id, device_type, component_id, timestamp, raw_data) {});
     expect(driver).toHaveError("data_processor should have data() or state(), or both");
   });
   it("should provide return data fields", function() {
-    var processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
+    var processor = driver.data_processor(function(device_id, device_type, component_id, timestamp, raw_data) {});
     processor.data({
       "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" }
     });
@@ -25,13 +25,13 @@ describe("data processor", function() {
     expect(driver).toHaveDataField("speed");
   });
   it("can also return state", function() {
-    var processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
+    var processor = driver.data_processor(function(device_id, device_type, component_id, timestamp, raw_data) {});
     processor.state('open', '打开状态', ['close']);
     expect(processor).not.toHaveError();
     expect(processor.validate().will_return_state).toBe(true);
   });
   it("or both", function() {
-    var processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
+    var processor = driver.data_processor(function(device_id, device_type, component_id, timestamp, raw_data) {});
     processor.data({
       "speed": { "name": "速度", "type": "number", "decimals": 2, "unit": "km" }
     }).state('open', '打开状态', ['close']);
@@ -42,7 +42,7 @@ describe("data processor", function() {
   });
   describe("data fields", function() {
     beforeEach(function() {
-      processor = driver.data_processor(function(device_id, device_type, timestamp, raw_data) {});
+      processor = driver.data_processor(function(device_id, device_type, component_id, timestamp, raw_data) {});
     });
     it("should allow number, string and boolean type", function() {
       processor.data({

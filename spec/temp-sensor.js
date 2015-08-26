@@ -5,7 +5,7 @@ driver.name('TS35型温度传感器')
 .email("david@lianwutech.com")
 .protocol("modbus");
 
-driver.data_processor(function(device_id, device_type, timestamp, raw_data) {
+driver.data_processor(function(device_id, device_type, component_id, timestamp, raw_data) {
   return {
     data: { 'temp': 39.5 }
   };

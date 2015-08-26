@@ -46,7 +46,7 @@ driver.action('set_speed_range', '设置移动速度的范围', function(min, ma
 driver.data_fetcher(function() { return '49ED'; });
 
 // 设备上报的数据，经过该函数翻译。翻译结果作为组件数据保存
-driver.data_processor(function(device_id, device_type, timestamp, raw_data) {
+driver.data_processor(function(device_id, device_type, component_id, timestamp, raw_data) {
   if (typeof devices_dict[device_id] === Undefined) {
     error("no device_id " + device_id + " found");
   }

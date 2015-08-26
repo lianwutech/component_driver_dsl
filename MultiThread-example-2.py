@@ -56,7 +56,7 @@ class ComponentDriver (threading.Thread):
                 self.locker.enter()
                 print "%s process_data returns:" % self.name
                 result = self.ctxt.eval(
-                    "var result = driver.process_data('8D4B6F_1', 1101, '2014-07-25 09:41:43', '00');",
+                    "var result = driver.process_data('8D4B6F_1', 1101, 1, '2014-07-25 09:41:43', '00');",
                     'process_data')
                 print PyV8.convert(self.ctxt.locals.result)
 

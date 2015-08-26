@@ -5,7 +5,7 @@ driver.name('MS35型湿度传感器')
 .email('david@lianwutech.com')
 .protocol('standard');
 
-driver.data_processor(function(device_id, device_type, timestamp, raw_data) {
+driver.data_processor(function(device_id, device_type, component_id, timestamp, raw_data) {
   return {
     data: { 'mois': 65 }
   };

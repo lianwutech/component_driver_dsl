@@ -97,8 +97,8 @@ class RawDataProcessor
     @data_fields = {}
     @errors = []
 
-  process: (device_id, device_type, timestamp, raw_data) ->
-    @fn(device_id, device_type, timestamp, raw_data)
+  process: (device_id, device_type, component_id, timestamp, raw_data) ->
+    @fn(device_id, device_type, component_id, timestamp, raw_data)
 
   data: (data_fields) ->
     for own key, item of data_fields
@@ -243,12 +243,12 @@ class ComponentDriverDSL
       this.addError "action_result_processor should have exactly 2 parameters: #{required_params}"
 
   data_processor: (fn) ->
-    required_params = ['device_id', 'device_type', 'timestamp', 'raw_data']
+    required_params = ['device_id', 'device_type', 'component_id', 'timestamp', 'raw_data']
     params = getParamNames(fn)
     if (arrayEquals(params, required_params))
       @raw_data_processor = new RawDataProcessor(fn)
     else
-      this.addError "data_processor should have exactly 4 parameters: #{required_params}"
+      this.addError "data_processor should have exactly 5 parameters: #{required_params}"
 
   data_fetcher: (@fetcher) ->
 
@@ -304,11 +304,11 @@ class ComponentDriverDSL
         error err
     return retval
 
-  process_data: (device_id, device_type, timestamp, raw_data) ->
+  process_data: (device_id, device_type, component_id, timestamp, raw_data) ->
     try
-      @raw_data_processor.process(device_id, device_type, timestamp, raw_data)
+      @raw_data_processor.process(device_id, device_type, component_id, timestamp, raw_data)
     catch e
-      error "Error in process_data(#{device_id}, #{device_type}, #{timestamp}, #{raw_data}): #{e.name} - #{e.message}"
+      error "Error in process_data(#{device_id}, #{device_type}, #{component_id}, #{timestamp}, #{raw_data}): #{e.name} - #{e.message}"
       logStack e.stack
 
   splat = (result, subject) ->

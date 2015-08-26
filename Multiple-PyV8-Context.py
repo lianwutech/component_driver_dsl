@@ -35,7 +35,7 @@ for i in range(3):
 
     for j in range(3):
         print "process_data:"
-        print PyV8.convert(contexts[j].eval("driver.process_data('" + str(j) + "', 1101, '2014-07-25 09:41:43', '" + str(i*100 + j) + "');"))
+        print PyV8.convert(contexts[j].eval("driver.process_data('" + str(j) + "', 1101, 1, '2014-07-25 09:41:43', '" + str(i*100 + j) + "');"))
 
         print "translate_action:"
         result = contexts[j].eval("driver.translate_action('move')")

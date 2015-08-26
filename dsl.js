@@ -169,8 +169,8 @@ RawDataProcessor = (function() {
     this.errors = [];
   }
 
-  RawDataProcessor.prototype.process = function(device_id, device_type, timestamp, raw_data) {
-    return this.fn(device_id, device_type, timestamp, raw_data);
+  RawDataProcessor.prototype.process = function(device_id, device_type, component_id, timestamp, raw_data) {
+    return this.fn(device_id, device_type, component_id, timestamp, raw_data);
   };
 
   RawDataProcessor.prototype.data = function(data_fields) {
@@ -357,12 +357,12 @@ ComponentDriverDSL = (function() {
 
   ComponentDriverDSL.prototype.data_processor = function(fn) {
     var params, required_params;
-    required_params = ['device_id', 'device_type', 'timestamp', 'raw_data'];
+    required_params = ['device_id', 'device_type', 'component_id', 'timestamp', 'raw_data'];
     params = getParamNames(fn);
     if (arrayEquals(params, required_params)) {
       return this.raw_data_processor = new RawDataProcessor(fn);
     } else {
-      return this.addError("data_processor should have exactly 4 parameters: " + required_params);
+      return this.addError("data_processor should have exactly 5 parameters: " + required_params);
     }
   };
 
@@ -449,13 +449,13 @@ ComponentDriverDSL = (function() {
     return retval;
   };
 
-  ComponentDriverDSL.prototype.process_data = function(device_id, device_type, timestamp, raw_data) {
+  ComponentDriverDSL.prototype.process_data = function(device_id, device_type, component_id, timestamp, raw_data) {
     var e;
     try {
-      return this.raw_data_processor.process(device_id, device_type, timestamp, raw_data);
+      return this.raw_data_processor.process(device_id, device_type, component_id, timestamp, raw_data);
     } catch (_error) {
       e = _error;
-      error("Error in process_data(" + device_id + ", " + device_type + ", " + timestamp + ", " + raw_data + "): " + e.name + " - " + e.message);
+      error("Error in process_data(" + device_id + ", " + device_type + ", " + component_id + ", " + timestamp + ", " + raw_data + "): " + e.name + " - " + e.message);
       return logStack(e.stack);
     }
   };

@@ -11,7 +11,7 @@ describe("runtime behaviour", function() {
     };
   });
   beforeEach(function() {
-    driver.data_processor(function(device_id, device_type, timestamp, raw_data) {
+    driver.data_processor(function(device_id, device_type, component_id, timestamp, raw_data) {
       return {
         data: { x: parseInt(raw_data.substring(0,2), 16), y: parseInt(raw_data.substring(2,4), 16) },
         state: 'none'
@@ -22,17 +22,17 @@ describe("runtime behaviour", function() {
     }).state('none', '没有状态', []);
   });
   it("should return valid data and state", function() {
-    var result = driver.process_data("DEVICE_ID", 0, "2013-33-33", "CCFF");
+    var result = driver.process_data("DEVICE_ID", 0, 1, "2013-33-33", "CCFF");
     expect(result.data).toEqual({x: 204, y: 255});
     expect(result.state).toEqual("none");
     expect(result.error).toBeUndefined();
   });
   it("should catch js errors in data processor", function() {
-    driver.data_processor(function(device_id, device_type, timestamp, raw_data) {
+    driver.data_processor(function(device_id, device_type, component_id, timestamp, raw_data) {
       throw new Error("fake error");
     });
-    var result = driver.process_data("DEVICE_ID", 0, "2013-33-33", "CCFF");
-    expect(global.log).toHaveBeenCalledWith(40, 'Error in process_data(DEVICE_ID, 0, 2013-33-33, CCFF): Error - fake error');
+    var result = driver.process_data("DEVICE_ID", 0, 1, "2013-33-33", "CCFF");
+    expect(global.log).toHaveBeenCalledWith(40, 'Error in process_data(DEVICE_ID, 0, 1, 2013-33-33, CCFF): Error - fake error');
   });
   it("component should not be passive by default", function() {
     var result = driver.validate();
